@@ -18,7 +18,7 @@ public class RoleController {
         this.roleService = roleService;
     }
 
-    @GetMapping({"/listar", "/"})
+    @GetMapping({"/listar", ""})
     public String listarRoles(Model model) {
         Flux<RoleModel> roles = roleService.obtenerRoles();
         model.addAttribute("roles", roles);
@@ -27,14 +27,28 @@ public class RoleController {
 
     @GetMapping("/crear")
     public String mostrarFormularioCrearRol(Model model) {
-        model.addAttribute("rol", new RoleModel());
+        RoleModel roleModel = new RoleModel();
+        model.addAttribute("rol", roleModel);
         return "crear_rol";
     }
 
     @PostMapping("")
-    public String guardarRol(RoleModel rol) {
-        roleService.guardarRol(rol);
+    public String guardarRol(@ModelAttribute("rol") RoleModel roleModel) {
+        roleService.guardarRol(roleModel).subscribe(savedRole -> {
+            System.out.println("Rol guardado: " + savedRole);  // Logging
+        });
         return "redirect:/roles/listar";
+    }
+
+    @GetMapping("/editar/{id}")
+    public String mostrarFormularioEditarRol(@PathVariable Integer id, Model model) {
+        model.addAttribute("rol", roleService.obtenerRol(id));
+        return "editar_rol";
+    }
+
+    @PostMapping("/{id}")
+    public String actualizarRol(){
+
     }
 }
 
