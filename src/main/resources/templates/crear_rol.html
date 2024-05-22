@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Crear Rol</title>
+</head>
+<body>
+
+<h2>Crear Nuevo Rol</h2>
+    <form th:action="@{/roles/guardar}" th:object="${rol}" method="post"> <!-- action="/roles/guardar"/-->
+        <label for="rol">Rol:</label>
+        <input type="text" id="rol" th:field="'*{rol}'" name="rol" placeholder="Escriba Rol"><br><br>
+        <input type="submit" value="Guardar">
+    </form>
+    <a href="/roles/listar">Volver a la lista de roles</a>
+</body>
+
+</html>
