@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Controller
 @RequestMapping("/roles")
@@ -18,11 +18,14 @@ public class RoleController {
         this.roleService = roleService;
     }
 
-    @GetMapping({"/listar", ""})
-    public String listarRoles(Model model) {
-        Flux<RoleModel> roles = roleService.obtenerRoles();
-        model.addAttribute("roles", roles);
-        return "listar_roles";
+    @GetMapping("")
+    public Mono<String> listarRoles(Model model) {
+        return roleService.obtenerRoles()
+                .collectList()
+                .map(roles -> {
+                    model.addAttribute("roles", roles);
+                    return "listar_roles";
+                });
     }
 
     @GetMapping("/crear")
@@ -33,11 +36,10 @@ public class RoleController {
     }
 
     @PostMapping("")
-    public String guardarRol(@ModelAttribute("rol") RoleModel roleModel) {
-        roleService.guardarRol(roleModel).subscribe(savedRole -> {
-            System.out.println("Rol guardado: " + savedRole);  // Logging
-        });
-        return "redirect:/roles/listar";
+    public Mono<String> guardarRol(@ModelAttribute("rol") RoleModel roleModel) {
+        return roleService.guardarRol(roleModel)
+                .doOnError(error -> System.err.println("Error al guardar el rol: " + error.getMessage()))
+                .then(Mono.just("redirect:/roles"));
     }
 
     @GetMapping("/editar/{id}")
@@ -47,8 +49,23 @@ public class RoleController {
     }
 
     @PostMapping("/{id}")
-    public String actualizarRol(){
-
+    public Mono<String> editarRol(@PathVariable Integer id, @ModelAttribute("rol") RoleModel roleModel, Model model) {
+        return roleService.obtenerRol(id)
+                .flatMap(existingRole -> {
+                    existingRole.setRol(roleModel.getRol());
+                    return roleService.actualizarRol(existingRole);
+                })
+                .doOnError(error -> System.err.println("Error al editar el rol: " + error.getMessage()))
+                .then(Mono.just("redirect:/roles"));
     }
+
+    @GetMapping("/{id}")
+    public Mono<String> eliminarRol(@PathVariable Integer id) {
+        return roleService.eliminarRol(id)
+                .doOnError(error -> System.err.println("Error al eliminar el rol: " + error.getMessage()))
+                .then(Mono.just("redirect:/roles"));
+    }
+
 }
+
 
