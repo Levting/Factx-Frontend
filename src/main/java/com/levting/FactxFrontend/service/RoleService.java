@@ -33,7 +33,6 @@ public class RoleService {
     }
 
     public Mono<RoleModel> guardarRol(RoleModel roleModel) {
-        System.out.println("Enviando rol: " + roleModel); // Logging antes de enviar
         return webClient.post()
                 .uri("/rol")
                 .bodyValue(roleModel)
@@ -42,7 +41,6 @@ public class RoleService {
     }
 
     public Mono<RoleModel> actualizarRol(RoleModel roleModel) {
-        System.out.println("Enviando rol: " + roleModel);
         return webClient.post()
                 .uri("/rol")
                 .bodyValue(roleModel)

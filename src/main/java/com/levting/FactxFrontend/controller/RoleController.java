@@ -38,7 +38,12 @@ public class RoleController {
     @PostMapping("")
     public Mono<String> guardarRol(@ModelAttribute("rol") RoleModel roleModel) {
         return roleService.guardarRol(roleModel)
-                .doOnError(error -> System.err.println("Error al guardar el rol: " + error.getMessage()))
+                .doOnError(error -> {
+                    System.err.println("Error al guardar el rol: " + error.getMessage());
+                })
+                .doOnSuccess(savedRole -> {
+                    System.out.println("Rol creado con éxito! " + savedRole);
+                })
                 .then(Mono.just("redirect:/roles"));
     }
 
@@ -49,13 +54,14 @@ public class RoleController {
     }
 
     @PostMapping("/{id}")
-    public Mono<String> editarRol(@PathVariable Integer id, @ModelAttribute("rol") RoleModel roleModel, Model model) {
+    public Mono<String> editarRol(@PathVariable Integer id, @ModelAttribute("rol") RoleModel roleModel) {
         return roleService.obtenerRol(id)
                 .flatMap(existingRole -> {
                     existingRole.setRol(roleModel.getRol());
                     return roleService.actualizarRol(existingRole);
                 })
                 .doOnError(error -> System.err.println("Error al editar el rol: " + error.getMessage()))
+                .doOnSuccess(updatedRole -> System.out.println("Rol editado con éxito!" + updatedRole))
                 .then(Mono.just("redirect:/roles"));
     }
 
@@ -63,6 +69,7 @@ public class RoleController {
     public Mono<String> eliminarRol(@PathVariable Integer id) {
         return roleService.eliminarRol(id)
                 .doOnError(error -> System.err.println("Error al eliminar el rol: " + error.getMessage()))
+                .doOnSuccess(aVoid -> System.out.println("Rol Eliminado con Éxito!" + aVoid))
                 .then(Mono.just("redirect:/roles"));
     }
 
