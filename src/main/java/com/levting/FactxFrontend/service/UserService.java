@@ -1,7 +1,6 @@
 package com.levting.FactxFrontend.service;
 
 import com.levting.FactxFrontend.model.UserModel;
-import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.BodyInserters;
@@ -28,7 +27,7 @@ public class UserService {
                 .bodyToFlux(UserModel.class)
                 .onErrorResume(WebClientResponseException.class, ex -> {
                     System.err.println("Error al obtener usuarios: " + ex.getMessage());
-                    return Flux.empty(); // Retornar un Flujo vacío
+                    return Mono.empty();
                 });
     }
 
@@ -43,7 +42,7 @@ public class UserService {
                 });
     }
 
-    public Mono<UserModel> guardarUsuario(UserModel userModel){
+    public Mono<UserModel> guardarUsuario(UserModel userModel) {
         return webClient.post()
                 .uri("/usuario")
                 .body(BodyInserters.fromValue(userModel))
@@ -51,6 +50,42 @@ public class UserService {
                 .bodyToMono(UserModel.class)
                 .onErrorResume(WebClientResponseException.class, ex -> {
                     System.err.println("Error al guardar un Usuario: " + ex.getMessage());
+                    return Mono.empty();
+                });
+
+    }
+
+    public Mono<UserModel> actualizarUsuario(UserModel userModel) {
+        return webClient.post()
+                .uri("/usuario")
+                .bodyValue(userModel)
+                .retrieve()
+                .bodyToMono(UserModel.class)
+                .onErrorResume(WebClientResponseException.class, ex -> {
+                    System.err.println("Error al actualizar un Usuario: " + ex.getMessage());
+                    return Mono.empty();
+                });
+    }
+
+    public Mono<Void> eliminarUsuario(Integer id_usuario) {
+        return webClient.delete()
+                .uri("/usuario/{id}", id_usuario)
+                .retrieve()
+                .bodyToMono(Void.class)
+                .onErrorResume(WebClientResponseException.class, ex -> {
+                    System.err.println("Error al eliminar un Usuario: " + ex.getMessage());
+                    return Mono.empty();
+                });
+    }
+
+    public Mono<UserModel> iniciarSesion(String usuario, String contrasena) {
+        return webClient.get()
+                .uri("/usuario/query?usuario={usuario}&contrasena={contrasena}", usuario, contrasena)
+                .retrieve()
+                .bodyToMono(UserModel.class)
+                .switchIfEmpty(Mono.empty())
+                .onErrorResume(WebClientResponseException.class, ex -> {
+                    System.err.println("Error al eliminar un Usuario: " + ex.getMessage());
                     return Mono.empty();
                 });
 

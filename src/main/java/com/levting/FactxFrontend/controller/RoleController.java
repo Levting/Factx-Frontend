@@ -1,5 +1,6 @@
 package com.levting.FactxFrontend.controller;
 
+
 import com.levting.FactxFrontend.model.RoleModel;
 import com.levting.FactxFrontend.service.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,6 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
+
 
 @Controller
 @RequestMapping("/roles")
@@ -19,7 +21,7 @@ public class RoleController {
     }
 
     @GetMapping("")
-    public Mono<String> listarRoles(Model model) {
+    public Mono<String> mostrarRoles(Model model) {
         return roleService.obtenerRoles()
                 .collectList()
                 .map(roles -> {
