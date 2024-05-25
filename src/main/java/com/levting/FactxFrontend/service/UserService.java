@@ -4,7 +4,6 @@ import com.levting.FactxFrontend.model.UserModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -60,8 +59,8 @@ public class UserService {
         return webClient.get()
                 .uri("/usuario/query?usuario={usuario}&contrasena={contrasena}", usuario, contrasena)
                 .retrieve()
-                .bodyToMono(UserModel.class)
+                .bodyToFlux(UserModel.class)
+                .next()
                 .switchIfEmpty(Mono.empty());
-
     }
 }
