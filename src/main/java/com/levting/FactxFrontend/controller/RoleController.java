@@ -32,20 +32,16 @@ public class RoleController {
 
     @GetMapping("/crear")
     public String mostrarFormularioCrearRol(Model model) {
-        RoleModel roleModel = new RoleModel();
-        model.addAttribute("rol", roleModel);
+        model.addAttribute("rol", new RoleModel());
         return "crear_rol";
     }
 
     @PostMapping("")
     public Mono<String> guardarRol(@ModelAttribute("rol") RoleModel roleModel) {
+        System.out.println("Rol: " + roleModel);
         return roleService.guardarRol(roleModel)
-                .doOnError(error -> {
-                    System.err.println("Error al guardar el rol: " + error.getMessage());
-                })
-                .doOnSuccess(savedRole -> {
-                    System.out.println("Rol creado con éxito! " + savedRole);
-                })
+                .doOnError(error -> System.err.println("Error al guardar el rol: " + error.getMessage()))
+                .doOnSuccess(savedRole -> System.out.println("Rol creado con Éxito! " + savedRole))
                 .then(Mono.just("redirect:/roles"));
     }
 

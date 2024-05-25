@@ -28,10 +28,13 @@
     <div class="row">
         <div class="col-md-6 offset-md-3">
             <h2 class="mb-4 text-center">Editar Rol</h2>
-            <form th:action="@{/roles/{id}(id=${rol.id_rol})}" th:object="${rol}" method="post" class="needs-validation" novalidate>
+
+            <form th:action="@{/roles/{id}(id=${rol.id_rol})}" th:object="${rol}"
+                  method="post" class="needs-validation" novalidate>
                 <div class="mb-3">
                     <label for="rol" class="form-label">Rol:</label>
-                    <input type="text" id="rol" th:field="*{rol}" name="rol" placeholder="Escriba Rol"
+                    <input type="text" id="rol" th:field="*{rol}" name="rol"
+                           placeholder="Escriba Rol"
                            class="form-control" required>
                     <div class="invalid-feedback">
                         Por favor, ingrese un nombre de rol.

@@ -45,8 +45,7 @@ public class RoleService {
                 .uri("/rol")
                 .bodyValue(roleModel)
                 .retrieve()
-                .bodyToMono(RoleModel.class)
-                .doOnNext(savedRole -> System.out.println("Respuesta Recibida: " + savedRole));
+                .bodyToMono(RoleModel.class);
     }
 
     public Mono<Void> eliminarRol(Integer id_rol) {
