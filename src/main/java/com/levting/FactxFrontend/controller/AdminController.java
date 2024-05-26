@@ -16,7 +16,7 @@ public class AdminController {
             UserModel usuario = (UserModel) session.getAttributes().get("usuario");
             if (usuario != null) {
                 model.addAttribute("usuario", usuario);
-                return "administradores";
+                return "administradores/administradores";
             } else {
                 return "redirect:/inicio_sesion";
             }

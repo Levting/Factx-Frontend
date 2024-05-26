@@ -23,6 +23,7 @@
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
+
         <!-- Contenido del navbar -->
         <div class="collapse navbar-collapse" id="navbarNav">
             <!-- Enlaces a las páginas -->
@@ -40,7 +41,7 @@
             <!-- Menú vertical a la derecha -->
             <ul class="navbar-nav ms-auto">
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Zara Larsson</a>
+                    <p class="nav-link mb-0">[Nombre del Usuario en la Sesión]</p>
                 </li>
             </ul>
         </div>
@@ -50,15 +51,38 @@
 <!-- Contenido principal -->
 <div class="container mt-4">
     <h1>Contenido de la página de Facturación</h1>
+
     <!-- Aquí va el contenido de la página -->
 
-    <div class="card" style="width: 18rem;">
-        <div class="card-body">
-            <h5 class="card-title">[Factura]</h5>
-            <h6 class="card-subtitle mb-2 text-body-secondary">[Fecha]</h6>
-            <p class="card-text">[Nombre del Cliente]</p>
-            <a href="#" class="card-link">Ver PDF</a>
-            <a href="#" class="card-link">Ver XML</a>
+    <div class="d-flex justify-content-end mb-3">
+        <a href="#" class="btn btn-lg btn-secondary">Nueva Factura</a>
+    </div>
+
+    <form class="d-flex mb-3" role="search">
+        <input class="form-control me-2" type="search" placeholder="Buscar Factura por Cédula del Cliente"
+               aria-label="Search">
+        <button class="btn btn-outline-success" type="submit">Buscar</button>
+    </form>
+
+    <div class="d-flex flex-wrap gap-3 mt-4">
+        <div class="card" style="width: 18rem;">
+            <div class="card-body">
+                <h5 class="card-title">[Factura]</h5>
+                <h6 class="card-subtitle mb-2 text-body-secondary">[Fecha]</h6>
+                <p class="card-text">[Nombre del Cliente]</p>
+                <a href="#" class="card-link">Ver PDF</a>
+                <a href="#" class="card-link">Ver XML</a>
+            </div>
+        </div>
+
+        <div class="card" style="width: 18rem;">
+            <div class="card-body">
+                <h5 class="card-title">[Factura]</h5>
+                <h6 class="card-subtitle mb-2 text-body-secondary">[Fecha]</h6>
+                <p class="card-text">[Nombre del Cliente]</p>
+                <a href="#" class="card-link">Ver PDF</a>
+                <a href="#" class="card-link">Ver XML</a>
+            </div>
         </div>
     </div>
 
