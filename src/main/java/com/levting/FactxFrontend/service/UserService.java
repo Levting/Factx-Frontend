@@ -60,7 +60,6 @@ public class UserService {
                 .uri("/usuario/query?usuario={usuario}&contrasena={contrasena}", usuario, contrasena)
                 .retrieve()
                 .bodyToFlux(UserModel.class)
-                .next()
-                .switchIfEmpty(Mono.empty());
+                .next();
     }
 }
