@@ -22,7 +22,7 @@
         <div class="col-md-6 offset-md-3">
             <h2 class="mb-4 text-center">Añadir Nuevo Producto</h2>
 
-            <form th:action="@{/productos}" th:object="${producto}" enctype="multipart/form-data"
+            <form th:action="@{/inventario/productos}" th:object="${producto}" enctype="multipart/form-data"
                   class="needs-validation" method="post" id="formulario" novalidate>
 
                 <div class="mb-3">
@@ -31,7 +31,7 @@
                            placeholder="Escriba el Nombre del Producto"
                            class="form-control" required>
                     <div class="invalid-feedback">
-                        Por favor, ingrese el nombre.
+                        Por favor, ingrese el nombre del producto.
                     </div>
                 </div>
 
@@ -41,7 +41,7 @@
                               placeholder="Escriba la Descripcion"
                               class="form-control" rows="3" required></textarea>
                     <div class="invalid-feedback">
-                        Por favor, ingrese el nombre.
+                        Por favor, ingrese la descripcion.
                     </div>
                 </div>
 

@@ -1,43 +1,51 @@
 package com.levting.FactxFrontend.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.levting.FactxFrontend.model.ProductModel;
-import jakarta.servlet.http.Part;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Service;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.awt.image.DataBuffer;
+
 @Service
 public class ProductService {
 
     private final WebClient webClient;
-    private final ObjectMapper objectMapper;
 
 
     @Autowired
-    public ProductService(WebClient webClient, ObjectMapper objectMapper){
+    public ProductService(WebClient webClient) {
         this.webClient = webClient;
-        this.objectMapper = objectMapper;
-
     }
 
-    public Flux<ProductModel> obtenerProductos(){
+    public Flux<ProductModel> obtenerProductos() {
         return webClient.get()
                 .uri("/producto")
                 .retrieve()
                 .bodyToFlux(ProductModel.class);
     }
 
-    public Mono<ProductModel> guardarProducto(ProductModel productModel, FilePart icono){
+    public Mono<ProductModel> guardarProducto(ProductModel productModel, FilePart icono) {
+        // Crea un MultipartBodyBuilder y agrega el producto y el icono
+        MultipartBodyBuilder builder = new MultipartBodyBuilder();
+        builder.part("producto", productModel, MediaType.APPLICATION_JSON);
+        builder.part("icono", icono);
 
+        // Guarda el producto en la base de datos
+        return webClient.post()
+                .uri("/producto")
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .body(BodyInserters.fromMultipartData(builder.build()))
+                .retrieve()
+                .bodyToMono(ProductModel.class);
     }
 }
+
+
+
