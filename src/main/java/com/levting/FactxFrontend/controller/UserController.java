@@ -30,7 +30,7 @@ public class UserController {
         this.companyService = companyService;
     }
 
-    @GetMapping("")
+    @GetMapping()
     public Mono<String> mostrarUsuarios(Model model) {
         return userService.obtenerUsuarios()
                 .collectList()

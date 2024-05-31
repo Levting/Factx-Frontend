@@ -36,13 +36,14 @@
                     <a class="nav-link" th:href="@{/clientes}">Clientes</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" th:href="@{/empresas    }">Empresas</a>
+                    <a class="nav-link" th:href="@{/empresas}">Empresas</a>
                 </li>
             </ul>
             <!-- Menú vertical a la derecha -->
             <ul class="navbar-nav ms-auto">
                 <li class="nav-item">
                     <p class="nav-link mb-0">[Nombre del Usuario en la Sesión]</p>
+                    <!--th:text="${#session.usuario?.nombre}"-->
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" th:href="@{/iniciar_sesion}">Cerrar Sesion</a>

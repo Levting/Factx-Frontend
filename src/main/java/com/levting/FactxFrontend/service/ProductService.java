@@ -1,17 +1,20 @@
 package com.levting.FactxFrontend.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.levting.FactxFrontend.model.ProductModel;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.MediaType;
-import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Service;
+
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.awt.image.DataBuffer;
 
 @Service
 public class ProductService {
@@ -31,21 +34,19 @@ public class ProductService {
                 .bodyToFlux(ProductModel.class);
     }
 
-    public Mono<ProductModel> guardarProducto(ProductModel productModel, FilePart icono) {
-        // Crea un MultipartBodyBuilder y agrega el producto y el icono
-        MultipartBodyBuilder builder = new MultipartBodyBuilder();
-        builder.part("producto", productModel, MediaType.APPLICATION_JSON);
-        builder.part("icono", icono);
-
-        // Guarda el producto en la base de datos
+    public Mono<Void> guardarProducto(ProductModel productModel, FilePart icono) {
         return webClient.post()
                 .uri("/producto")
                 .contentType(MediaType.MULTIPART_FORM_DATA)
-                .body(BodyInserters.fromMultipartData(builder.build()))
+                .body(BodyInserters.fromMultipartData("producto", productModel)
+                        .with("icono", icono))
                 .retrieve()
-                .bodyToMono(ProductModel.class);
+                .bodyToMono(Void.class);
     }
+
+
 }
+
 
 
 

@@ -33,6 +33,7 @@ public class LoginController {
                             session.getAttributes().put("usuario", user);
                             System.out.println("Usuario almacenado en la sesión: " + user.getNombre() + " " + user.getApellido());
                             System.out.println("Inicio de Sesión Exitoso!");
+                            model.addAttribute("usuario", user);
                         }).subscribe();
                     })
                     .map(user -> {
