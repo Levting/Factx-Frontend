@@ -1,6 +1,5 @@
 package com.levting.FactxFrontend.controller;
 
-
 import com.levting.FactxFrontend.model.CompanyModel;
 import com.levting.FactxFrontend.model.RoleModel;
 import com.levting.FactxFrontend.model.UserModel;
@@ -50,7 +49,7 @@ public class UserController {
         }).thenReturn("crear_usuario");
     }
 
-    @PostMapping("")
+    @PostMapping()
     public Mono<String> guardarUsuario(@ModelAttribute("usuario") UserModel userModel) {
 
         Mono<CompanyModel> empresa = companyService.obtenerEmpresa(userModel.getEmpresa().getId_empresa());

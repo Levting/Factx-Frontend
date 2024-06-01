@@ -50,7 +50,7 @@
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
-                                    <h5 class="card-title mb-0" th:text="${producto.producto}">[Producto]</h5>
+                                    <h5 class="card-title mb-1" th:text="${producto.producto}">[Producto]</h5>
                                     <h6 class="card-subtitle mb-2 text-muted" th:text="${producto.categoria.categoria}">
                                         [Categoría]</h6>
                                 </div>
@@ -66,8 +66,9 @@
                                 <strong>Precio:</strong> $<span th:text="${producto.precio}">[Precio]</span><br>
                                 <strong>Cantidad:</strong> <span th:text="${producto.cantidad}">[Cantidad]</span>
                             </p>
-                            <a href="#" class="card-link">Editar</a>
-                            <a href="#" class="card-link">Eliminar</a>
+
+                            <a th:href="@{/inventario/productos/editar/{id}(id=${producto.id_producto})}" class="btn btn-info btn-sm">Editar</a>
+                            <a th:href="@{/inventario/productos/{id}(id=${producto.id_producto})}" class="btn btn-danger btn-sm">Eliminar</a>
                         </div>
                     </div>
                 </div>
