@@ -59,6 +59,14 @@ public class LoginController {
                     }));
         });
     }
+
+    @GetMapping("/cerrar_sesion")
+    public Mono<String> cerrarSesion(ServerWebExchange exchange) {
+        return exchange.getSession().flatMap(session -> {
+            session.invalidate();
+            return Mono.just("redirect:/inicio_sesion");
+        });
+    }
 }
 
 

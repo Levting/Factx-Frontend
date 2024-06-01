@@ -26,7 +26,7 @@ public class InventoryController {
         this.categoryService = categoryService;
     }
 
-    @GetMapping("/productos")
+    @GetMapping({"/productos", ""})
     public Mono<String> mostrarVistaInventario(Model model) {
         return productService.obtenerProductos()
                 .collectList()
