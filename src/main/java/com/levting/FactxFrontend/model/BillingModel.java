@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
 
 @Data
 @NoArgsConstructor
@@ -18,6 +17,7 @@ public class BillingModel {
     private Double subtotal;
     private Double total;
     private Double total_iva;
+    private BillDetailModel detalle;
     private CustomerModel cliente;
     private DocumentModel documento;
     private WayPayModel forma_pago;

@@ -1,7 +1,7 @@
 package com.levting.FactxFrontend.controller;
 
 import com.levting.FactxFrontend.model.BillingModel;
-import com.levting.FactxFrontend.model.ProductModel;
+import com.levting.FactxFrontend.model.CustomerModel;
 import com.levting.FactxFrontend.service.BillingService;
 import com.levting.FactxFrontend.service.CustomerService;
 import com.levting.FactxFrontend.service.ProductService;
@@ -11,6 +11,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Controller
@@ -56,5 +59,11 @@ public class BillingController {
             model.addAttribute("productos", tuple.getT2());
             model.addAttribute("formas_pago", tuple.getT3());
         }).thenReturn("facturacion/crear_factura");
+    }
+
+    @GetMapping("/clientes/buscar")
+    @ResponseBody
+    public Flux<CustomerModel> buscarClientes(@RequestParam("query") String query) {
+        return customerService.obtenerClienteNombreOcurrente(query);
     }
 }

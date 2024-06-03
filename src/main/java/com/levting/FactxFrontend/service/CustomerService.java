@@ -22,4 +22,11 @@ public class CustomerService {
                 .bodyToFlux(CustomerModel.class);
 
     }
+
+    public Flux<CustomerModel> obtenerClienteNombreOcurrente(String nombre) {
+        return webClient.get()
+                .uri("/cliente/query?nombre={nombre}", nombre)
+                .retrieve()
+                .bodyToFlux(CustomerModel.class);
+    }
 }
