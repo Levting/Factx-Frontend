@@ -42,11 +42,10 @@
             <!-- Menú vertical a la derecha -->
             <ul class="navbar-nav ms-auto">
                 <li class="nav-item">
-                    <p th:text="${usuario.nombre} + ' ' + ${usuario.apellido}" class="nav-link mb-0">[Nombre del Usuario
-                        en la Sesión]</p>
+                    <p th:if="${usuario != null}" th:text="${usuario.nombre} + ' ' + ${usuario.apellido}" class="nav-link mb-0">[Nombre del Usuario en la Sesión]</p>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" th:href="@{/iniciar_sesion}">Cerrar Sesion</a>
+                    <a class="nav-link" th:href="@{/cerrar_sesion}">Cerrar Sesion</a>
                 </li>
             </ul>
         </div>

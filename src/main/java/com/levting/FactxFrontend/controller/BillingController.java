@@ -2,6 +2,7 @@ package com.levting.FactxFrontend.controller;
 
 import com.levting.FactxFrontend.model.BillingModel;
 import com.levting.FactxFrontend.model.CustomerModel;
+import com.levting.FactxFrontend.model.UserModel;
 import com.levting.FactxFrontend.service.BillingService;
 import com.levting.FactxFrontend.service.CustomerService;
 import com.levting.FactxFrontend.service.ProductService;
@@ -9,10 +10,7 @@ import com.levting.FactxFrontend.service.WayPayService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -36,29 +34,28 @@ public class BillingController {
 
     @GetMapping
     public Mono<String> mostrarPaginaFacturacion(Model model) {
-        return billingService.obtenerFacturas()
-                .collectList()
-                .doOnNext(facturas -> {
-                    if (facturas.isEmpty()) {
-                        System.out.println("No existen Facturas!");
-                    } else {
-                        model.addAttribute("facturas", facturas);
-                    }
-                }).thenReturn("facturacion/facturas");
+        UserModel usuario = (UserModel) model.getAttribute("usuario");
+        if (usuario != null) {
+            return billingService.obtenerFacturas()
+                    .collectList()
+                    .doOnNext(facturas -> {
+                        if (facturas.isEmpty()) {
+                            System.out.println("No existen Facturas!");
+                        } else {
+                            model.addAttribute("facturas", facturas);
+                        }
+                    }).thenReturn("facturacion/facturas");
+        } else {
+            return Mono.just("redirect:/inicio_sesion");
+        }
     }
 
     @GetMapping("/facturas/crear")
     public Mono<String> mostrarFormularioCrearFactura(Model model) {
         model.addAttribute("factura", new BillingModel());
-        return Mono.zip(
-                customerService.obtenerClientes().collectList(),
-                productService.obtenerProductos().collectList(),
-                wayPayService.obtenerFormasPago().collectList()
-        ).doOnNext(tuple -> {
-            model.addAttribute("clientes", tuple.getT1());
-            model.addAttribute("productos", tuple.getT2());
-            model.addAttribute("formas_pago", tuple.getT3());
-        }).thenReturn("facturacion/crear_factura");
+        return customerService.obtenerClientes().collectList()
+                .doOnNext(clientes -> model.addAttribute("clientes", clientes))
+                .thenReturn("facturacion/crear_factura");
     }
 
     @GetMapping("/clientes/buscar")
@@ -66,4 +63,20 @@ public class BillingController {
     public Flux<CustomerModel> buscarClientes(@RequestParam("query") String query) {
         return customerService.obtenerClienteNombreOcurrente(query);
     }
+
+    @PostMapping("/factura/abrir")
+    public void abrirFactura(@ModelAttribute("factura") BillingModel billingModel, Model model) {
+        // Obtener el usuario del modelo
+        UserModel usuario = (UserModel) model.getAttribute("usuario");
+        if (usuario != null) {
+            // Realizar cualquier procesamiento necesario con el usuario
+            System.out.println("Usuario: " + usuario.getNombre());
+            // Obtener el ID del cliente
+            System.out.println("ID del cliente: " + billingModel.getCliente().getNombre());
+        } else {
+            // Manejar el caso si el usuario no está presente
+            System.out.println("Usuario no encontrado.");
+        }
+    }
+
 }

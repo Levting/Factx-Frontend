@@ -1,10 +1,15 @@
 package com.levting.FactxFrontend.service;
 
 import com.levting.FactxFrontend.model.BillingModel;
+import com.levting.FactxFrontend.model.CustomerModel;
+import com.levting.FactxFrontend.model.UserModel;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Service
 public class BillingService {
@@ -20,5 +25,15 @@ public class BillingService {
                 .uri("/factura")
                 .retrieve()
                 .bodyToFlux(BillingModel.class);
+    }
+
+    public Mono<BillingModel> abrirFactura(Integer id_usuario, Integer id_cliente) {
+        return webClient.post()
+                .uri("/factura/abrir")
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .body(BodyInserters.fromFormData("usuario", String.valueOf(id_usuario))
+                        .with("cliente", String.valueOf(id_cliente)))
+                .retrieve()
+                .bodyToMono(BillingModel.class);
     }
 }

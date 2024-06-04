@@ -17,93 +17,25 @@
 
 <div class="container mt-4">
     <h2 class="mb-4 text-center">Nueva Factura</h2>
-    <form th:action="@{/facturacion/facturas}" th:object="${factura}" enctype="multipart/form-data"
+    <form th:action="@{/facturacion/factura/abrir}" th:object="${factura}"
           class="needs-validation" method="post" novalidate>
         <div class="row">
-
-            <div class="col-md-8">
-                <!-- Detalles de la factura -->
-                <h4>Detalles de la Factura:</h4>
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <label for="id_factura" class="form-label">Número de Factura:</label>
-                        <input type="text" id="id_factura" name="id_factura" th:field="*{id_factura}"
-                               class="form-control" disabled>
-                    </div>
-                    <div class="col-md-6">
-                        <label for="fecha" class="form-label">Fecha:</label>
-                        <input type="date" id="fecha" name="fecha" th:field="*{fecha}" class="form-control" disabled>
-                    </div>
+            <h4>Datos del Cliente</h4>
+            <div class="mb-3">
+                <label for="customer-search" class="form-label">Cliente:</label>
+                <div class="input-group">
+                    <input type="text" id="customer-search" class="form-control"
+                           placeholder="Escribe para buscar...">
                 </div>
-
-                <h4>Datos del Cliente</h4>
-                <div class="mb-3">
-                    <label for="customer-search" class="form-label">Buscar Cliente:</label>
-                    <input type="text" id="customer-search" class="form-control" placeholder="Escribe para buscar...">
-                    <ul id="customer-list" class="list-group" style="display: none;"></ul>
-                    <input type="hidden" id="cliente" name="cliente.id_cliente" th:field="*{cliente.id_cliente}">
-                    <div class="invalid-feedback">
-                        Por favor, seleccione un Cliente.
-                    </div>
-                </div>
-
-                <h3>Detalle</h3>
-                <div class="mb-3">
-                    <label for="producto" class="form-label">Producto:</label>
-                    <select id="producto" name="detalle.producto.producto" th:field="*{detalle.producto.producto}"
-                            class="form-select"
-                            required>
-                        <option value="" selected>Selecciona un Producto</option>
-                        <option th:each="producto : ${productos}" th:value="${producto.id_producto}"
-                                th:text="${producto.producto}"></option>
-                    </select>
-                    <div class="invalid-feedback">
-                        Por favor, seleccione un Producto.
-                    </div>
-                </div>
-                <!-- Los productos seleccionados en el buscador -->
-
-                <div class="table-responsive">
-                    <table class="table table-striped table-hover">
-                        <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Item</th>
-                            <th>Cantidad</th>
-                            <th>Precio Unitario</th>
-                            <th>Acción</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr th:each="producto : ${productos}">
-                            <td class="align-middle" th:text="${producto.id_producto}">[ID]</td>
-                            <td class="align-middle">
-                                <div class="d-flex align-items-center">
-                                    <img th:src="@{'http://localhost:8080' + ${producto.icono}}"
-                                         alt="Icono del Producto"
-                                         class="img-fluid me-2" style="width: 40px; height: 40px;">
-                                    <div>
-                                        <div th:text="${producto.producto}">[Nombre del Producto]</div>
-                                        <small class="text-muted" th:text="${producto.categoria.categoria}">[Categoría
-                                            del
-                                            Producto]</small>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="align-middle" th:text="${producto.cantidad}">[Cantidad]</td>
-                            <td class="align-middle" th:text="${producto.precio}">[Precio Unitario]</td>
-                            <td class="align-middle">
-                                <a th:href="@{#}" class="btn btn-danger btn-sm">Eliminar</a>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
-
+                <ul id="customer-list" class="list-group" style="display: none;"></ul>
+                <input type="hidden" id="cliente" name="cliente.id_cliente" th:field="*{cliente.id_cliente}" required>
+                <div class="invalid-feedback">
+                    Por favor, seleccione un Cliente.
                 </div>
             </div>
 
-            <div class="col-md-4">
-
+            <div class="d-flex justify-content-end">
+                <button type="submit" id="abrir-factura" class="btn btn-outline-secondary ms-auto">Abrir Factura</button>
             </div>
         </div>
     </form>
@@ -115,23 +47,25 @@
         crossorigin="anonymous"></script>
 
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+
+<!-- Búsqueda de los Clientes -->
 <script>
     $(document).ready(function() {
         $("#customer-search").on("input", function() {
             var query = $(this).val();
-            if (query.length > 0) { // Cambiado para que la búsqueda comience desde la primera letra
+            if (query.length > 0) {
                 $.ajax({
                     url: "/facturacion/clientes/buscar",
                     type: "GET",
                     data: { query: query },
                     success: function(data) {
+                        $("#customer-list").empty().show();
                         if (data.length > 0) {
-                            $("#customer-list").empty().show();
                             data.forEach(function(customer) {
                                 $("#customer-list").append('<li class="list-group-item" data-id="' + customer.id_cliente + '">' + customer.nombre + ' ' + customer.apellido + '</li>');
                             });
                         } else {
-                            $("#customer-list").empty().append('<li class="list-group-item">Cliente no encontrado</li>').show();
+                            $("#customer-list").append('<li class="list-group-item no-select">Cliente no encontrado</li>');
                         }
                     }
                 });
@@ -140,37 +74,22 @@
             }
         });
 
-        $(document).on("click", "#customer-list li", function() {
+        $(document).on("click", "#customer-list li:not(.no-select)", function() {
             var selectedCustomer = $(this).text();
             var customerId = $(this).data("id");
             $("#customer-search").val(selectedCustomer);
             $("#cliente").val(customerId);
             $("#customer-list").hide();
+            $("#cliente").removeClass("is-invalid");
+        });
+
+        $("form").on("submit", function(event) {
+            if ($("#cliente").val() === "") {
+                event.preventDefault();
+                $("#cliente").addClass("is-invalid");
+            }
         });
     });
-</script>
-
-<script>
-    // Ejemplo de JavaScript para validación de formularios
-    (function () {
-        'use strict'
-
-        // Obtener todos los formularios a los que queremos aplicar estilos de validación de Bootstrap personalizados
-        var forms = document.querySelectorAll('.needs-validation')
-
-        // Bucle sobre ellos y evitar el envío
-        Array.prototype.slice.call(forms)
-            .forEach(function (form) {
-                form.addEventListener('submit', function (event) {
-                    if (!form.checkValidity()) {
-                        event.preventDefault()
-                        event.stopPropagation()
-                    }
-
-                    form.classList.add('was-validated')
-                }, false)
-            })
-    })()
 </script>
 
 </body>
