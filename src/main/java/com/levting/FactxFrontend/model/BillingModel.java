@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BillingModel {
-    private Integer id_factura;
+    private Integer idFactura;
     private String clave_acceso;
     private String estado;
     private String fecha;
@@ -20,6 +20,6 @@ public class BillingModel {
     private BillDetailModel detalle;
     private CustomerModel cliente;
     private DocumentModel documento;
-    private WayPayModel forma_pago;
+    private WayPayModel formaPago;
     private UserModel usuario;
 }

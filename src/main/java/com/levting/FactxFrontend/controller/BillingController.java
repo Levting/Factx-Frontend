@@ -83,15 +83,17 @@ public class BillingController {
             int id_cliente = billingModel.getCliente().getId_cliente();
 
             return billingService.abrirFactura(id_usuario, id_cliente)
-                    .map(facturaId -> {
-                        Map<String, Object> response = new HashMap<>();
-                        response.put("success", true);
-                        response.put("message", "Factura abierta correctamente");
+                    .map(factura -> {
 
                         // Crear el modelo del detalle y guardarlo en el modelo de la vista
                         BillDetailModel billDetailModel = new BillDetailModel();
-                        billDetailModel.setFactura(billingModel);
-                        model.addAttribute("detallesFactura", billDetailModel);
+                        billDetailModel.setFactura(factura); // Usar la factura retornada por el servicio
+
+                        // Devolver el ID de la factura y el detalle de la factura como respuesta
+                        Map<String, Object> response = new HashMap<>();
+                        response.put("success", true);
+                        response.put("message", "Factura abierta correctamente");
+                        response.put("detalleFactura", billDetailModel);
 
                         return response;
                     })
@@ -108,6 +110,5 @@ public class BillingController {
             return Mono.just(response);
         }
     }
-
 
 }

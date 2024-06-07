@@ -38,6 +38,14 @@ public class BillingService {
                 .bodyToMono(BillingModel.class);
     }
 
+    public Mono<BillingModel> obtenerFactura(Integer id_factura){
+        return webClient.get()
+                .uri("/factura/{id}", id_factura)
+                .retrieve()
+                .bodyToMono(BillingModel.class);
+    }
+
+
     public Mono<BillDetailModel> añadirDetalles(Integer id_factura, Integer id_producto, Integer cantidad_producto){
         return webClient.post()
                 .uri("/detallesFactura")

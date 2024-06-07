@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum=scale=1.0">
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Crear Factura</title>
 
@@ -47,19 +47,21 @@
             <div id="detalles-section" style="display: none;">
                 <h4>Detalles de la Factura:</h4>
 
-                <div class="row mb-3" th:if="${detallesFactura != null}">
+                <div class="row mb-3">
                     <div class="col-md-6">
-                        <label for="id_factura" class="form-label">Número de Factura:</label>
-                        <!-- Accede al ID de la factura a través del modelo de detalle de factura -->
-                        <input type="text" id="id_factura" name="id_factura" th:value="${detallesFactura.factura.id_factura}" class="form-control" disabled>
+                        <label for="numero_factura" class="form-label">Número de Factura:</label>
+                        <input type="text" id="numero_factura" name="numero_factura" class="form-control" disabled>
+                        <!--<input type="text" id="numero_factura" name="numero_factura" class="form-control"
+                               th:value="${factura.numero_factura}" disabled>-->
+
                     </div>
                     <div class="col-md-6">
                         <label for="fecha" class="form-label">Fecha:</label>
-                        <!-- Accede a la fecha de la factura a través del modelo de detalle de factura -->
-                        <input type="date" id="fecha" name="fecha" th:value="${detallesFactura.factura.fecha}" class="form-control" disabled>
+                        <input type="text" id="fecha" name="fecha" class="form-control" disabled>
+                        <!--<input type="text" id="fecha" name="fecha" class="form-control"
+                               th:value="${#dates.format(detallesFactura.factura.fecha, 'dd/MM/yyyy')}" disabled>-->
                     </div>
                 </div>
-
             </div>
 
         </div>
@@ -122,7 +124,7 @@
                 return;
             }
 
-            // Deshabilitar el buscador y los botones
+            // Deshabilitar el buscador y el botón de añadir cliente
             $('#customer-search, #add-customer-btn, #abrir-factura').prop('disabled', true);
             $('#detalles-section').show();
 
@@ -135,8 +137,19 @@
                 data: formData,
                 success: function(response) {
                     if (response.success) {
-                        console.log(response.message);
                         // Aquí puedes mostrar un mensaje de éxito si es necesario
+                        console.log(response.message);
+
+                        // Obtener el numero de la factura del detalle
+                        var numeroFactura = response.detalleFactura.factura.numero_factura;
+
+                        // Obtener la fecha de la factura abierta
+                        var fechaFactura = response.detalleFactura.factura.fecha;
+
+                        // Asignar el número de factura y la fecha al div oculto
+                        $("#numero_factura").val(numeroFactura);
+                        $("#fecha").val(fechaFactura);
+
                     } else {
                         console.log(response.message);
                         // Aquí puedes manejar el error y mostrar un mensaje al usuario
@@ -148,7 +161,7 @@
                 },
                 complete: function() {
                     // Habilitar el campo de búsqueda y los botones después de completar la solicitud AJAX
-                    $('#customer-search, #add-customer-btn, #abrir-factura').prop('disabled', false);
+                    // $('#customer-search, #add-customer-btn, #abrir-factura').prop('disabled', false);
                 }
             });
         });
