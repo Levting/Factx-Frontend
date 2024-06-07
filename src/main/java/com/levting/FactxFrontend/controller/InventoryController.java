@@ -3,6 +3,8 @@ package com.levting.FactxFrontend.controller;
 import com.levting.FactxFrontend.model.CategoryModel;
 import com.levting.FactxFrontend.model.ProductModel;
 import com.levting.FactxFrontend.service.CategoryService;
+import com.levting.FactxFrontend.service.CompanyService;
+import com.levting.FactxFrontend.service.IVAService;
 import com.levting.FactxFrontend.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -17,13 +19,23 @@ import reactor.core.publisher.Mono;
 @RequestMapping("/inventario")
 public class InventoryController {
 
+    // Este controlador gestionara a los productos, categorías e IVAs.
+
     private final ProductService productService;
     private final CategoryService categoryService;
+    private final IVAService ivaService;
+    private final CompanyService companyService;
+
+    /**
+     * Controlador de los productos
+     */
 
     @Autowired
-    public InventoryController(ProductService productService, CategoryService categoryService) {
+    public InventoryController(ProductService productService, CategoryService categoryService, IVAService ivaService, CompanyService companyService) {
         this.productService = productService;
         this.categoryService = categoryService;
+        this.ivaService = ivaService;
+        this.companyService = companyService;
     }
 
     @GetMapping({"/productos", ""})
@@ -127,6 +139,77 @@ public class InventoryController {
                 .thenReturn("redirect:/inventario/productos");
     }
 
+    /**
+     * Controlador para las Categorías
+     */
+
+    @GetMapping("/categorias")
+    public Mono<String> obtenerCategorias(Model model) {
+        return categoryService.obtenerCategorias()
+                .collectList()
+                .doOnNext(categorias -> model.addAttribute("categorias", categorias))
+                .thenReturn("inventario/categorias");
+
+    }
+
+    @PostMapping("/categorias")
+    public Mono<String> guardarCategoria(@ModelAttribute("categoria") CategoryModel categoryModel) {
+        return categoryService.guardarCategoria(categoryModel)
+                .doOnError(error -> System.out.println("Error al Guardar una Categoria!" + error.getMessage()))
+                .doOnSuccess(sucess -> System.out.println("Guardado Exitoso!"))
+                .thenReturn("redirect:/inventario/categorias");
+    }
+
+    @PostMapping("/categorias/{id}")
+    public Mono<String> editarUsuario(@PathVariable Integer id, @ModelAttribute("categoria") CategoryModel categoryModel) {
+        return categoryService.obtenerCategoria(id)
+                .flatMap(categoriaExistente -> {
+                    categoriaExistente.setCategoria(categoryModel.getCategoria());
+                    categoriaExistente.setIva(categoryModel.getIva());
+                    categoriaExistente.setEmpresa(categoryModel.getEmpresa());
+                    return categoryService.guardarCategoria(categoriaExistente);
+                })
+                .doOnError(error -> System.err.println("Error al editar: " + error.getMessage()))
+                .doOnSuccess(success -> System.out.println("Edicion Exitosa!"))
+                .thenReturn("redirect:/inventario/categorias");
+
+    }
+
+    @GetMapping("/categorias/{id}")
+    public Mono<String> eliminarCategoria(@PathVariable Integer id) {
+        return categoryService.eliminarCategoria(id)
+                .doOnError(error -> System.err.println("Error al Eliminar" + error.getMessage()))
+                .doOnSuccess(success -> System.out.println("Eliminacion Exitosa!"))
+                .thenReturn("redirect:/inventario/categorias");
+    }
+
+    // FORMULARIOS
+    @GetMapping("/categorias/crear")
+    public Mono<String> mostrarFormularioCrearCategoria(Model model) {
+        model.addAttribute("categoria", new CategoryModel());
+        return Mono.zip(
+                ivaService.obtenerIVAs().collectList(),
+                companyService.obtenerEmpresas().collectList()
+        ).doOnNext(tuple -> {
+            model.addAttribute("ivas", tuple.getT1());
+            model.addAttribute("empresas", tuple.getT2());
+        }).thenReturn("inventario/crear_categoria");
+    }
+
+    @GetMapping("/categorias/editar/{id}")
+    public Mono<String> mostrarFormularioEditarCategoria(@PathVariable Integer id, Model model) {
+        return Mono.zip(
+                categoryService.obtenerCategoria(id),
+                ivaService.obtenerIVAs().collectList(),
+                companyService.obtenerEmpresas().collectList()
+        ).doOnNext(tuple -> {
+            model.addAttribute("categoria", tuple.getT1());
+            model.addAttribute("ivas", tuple.getT2());
+            model.addAttribute("empresas", tuple.getT3());
+        }).thenReturn("inventario/editar_categoria");
+
+
+    }
 }
 
 

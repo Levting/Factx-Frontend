@@ -1,5 +1,6 @@
 package com.levting.FactxFrontend.controller;
 
+import com.levting.FactxFrontend.model.BillDetailModel;
 import com.levting.FactxFrontend.model.BillingModel;
 import com.levting.FactxFrontend.model.CustomerModel;
 import com.levting.FactxFrontend.model.UserModel;
@@ -13,6 +14,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/facturacion")
@@ -50,13 +54,18 @@ public class BillingController {
         }
     }
 
+    // FORMULARIOS
     @GetMapping("/facturas/crear")
     public Mono<String> mostrarFormularioCrearFactura(Model model) {
         model.addAttribute("factura", new BillingModel());
+
+        UserModel usuario = (UserModel) model.getAttribute("usuario");
+        model.addAttribute("usuario", usuario);
         return customerService.obtenerClientes().collectList()
                 .doOnNext(clientes -> model.addAttribute("clientes", clientes))
                 .thenReturn("facturacion/crear_factura");
     }
+
 
     @GetMapping("/clientes/buscar")
     @ResponseBody
@@ -64,19 +73,41 @@ public class BillingController {
         return customerService.obtenerClienteNombreOcurrente(query);
     }
 
+
     @PostMapping("/factura/abrir")
-    public void abrirFactura(@ModelAttribute("factura") BillingModel billingModel, Model model) {
-        // Obtener el usuario del modelo
+    @ResponseBody
+    public Mono<Map<String, Object>> abrirFactura(@ModelAttribute("factura") BillingModel billingModel, Model model) {
         UserModel usuario = (UserModel) model.getAttribute("usuario");
-        if (usuario != null) {
-            // Realizar cualquier procesamiento necesario con el usuario
-            System.out.println("Usuario: " + usuario.getNombre());
-            // Obtener el ID del cliente
-            System.out.println("ID del cliente: " + billingModel.getCliente().getNombre());
+        if (usuario != null && billingModel.getCliente() != null) {
+            int id_usuario = usuario.getId_usuario();
+            int id_cliente = billingModel.getCliente().getId_cliente();
+
+            return billingService.abrirFactura(id_usuario, id_cliente)
+                    .map(facturaId -> {
+                        Map<String, Object> response = new HashMap<>();
+                        response.put("success", true);
+                        response.put("message", "Factura abierta correctamente");
+
+                        // Crear el modelo del detalle y guardarlo en el modelo de la vista
+                        BillDetailModel billDetailModel = new BillDetailModel();
+                        billDetailModel.setFactura(billingModel);
+                        model.addAttribute("detallesFactura", billDetailModel);
+
+                        return response;
+                    })
+                    .onErrorResume(error -> {
+                        Map<String, Object> response = new HashMap<>();
+                        response.put("success", false);
+                        response.put("message", "Error al abrir la factura: " + error.getMessage());
+                        return Mono.just(response);
+                    });
         } else {
-            // Manejar el caso si el usuario no está presente
-            System.out.println("Usuario no encontrado.");
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", false);
+            response.put("message", "Usuario o Cliente no encontrado.");
+            return Mono.just(response);
         }
     }
+
 
 }

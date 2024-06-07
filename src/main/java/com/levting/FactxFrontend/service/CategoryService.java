@@ -26,7 +26,7 @@ public class CategoryService {
 
     public Mono<CategoryModel> obtenerCategoria(Integer id_categoria) {
         return webClient.get()
-                .uri("/categoria")
+                .uri("/categoria/{id}", id_categoria)
                 .retrieve()
                 .bodyToMono(CategoryModel.class);
     }

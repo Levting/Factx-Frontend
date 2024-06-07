@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum=scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Crear Factura</title>
 
@@ -17,15 +17,19 @@
 
 <div class="container mt-4">
     <h2 class="mb-4 text-center">Nueva Factura</h2>
-    <form th:action="@{/facturacion/factura/abrir}" th:object="${factura}"
-          class="needs-validation" method="post" novalidate>
+    <form id="factura-form" th:action="@{/facturacion/factura/abrir}" th:object="${factura}" class="needs-validation"
+          method="post" novalidate>
         <div class="row">
+
+            <input type="hidden" id="usuario" name="usuario.id_usuario" th:value="${usuario.id_usuario}"/>
+
             <h4>Datos del Cliente</h4>
             <div class="mb-3">
                 <label for="customer-search" class="form-label">Cliente:</label>
                 <div class="input-group">
-                    <input type="text" id="customer-search" class="form-control"
-                           placeholder="Escribe para buscar...">
+                    <input type="text" id="customer-search" class="form-control" placeholder="Escribe para buscar..."
+                           autocomplete="off">
+                    <button id="add-customer-btn" class="btn btn-outline-secondary" type="button">Añadir</button>
                 </div>
                 <ul id="customer-list" class="list-group" style="display: none;"></ul>
                 <input type="hidden" id="cliente" name="cliente.id_cliente" th:field="*{cliente.id_cliente}" required>
@@ -35,8 +39,29 @@
             </div>
 
             <div class="d-flex justify-content-end">
-                <button type="submit" id="abrir-factura" class="btn btn-outline-secondary ms-auto">Abrir Factura</button>
+                <button type="submit" id="abrir-factura" class="btn btn-outline-secondary ms-auto">Abrir Factura
+                </button>
             </div>
+
+            <!-- Sección de los Detalles -->
+            <div id="detalles-section" style="display: none;">
+                <h4>Detalles de la Factura:</h4>
+
+                <div class="row mb-3" th:if="${detallesFactura != null}">
+                    <div class="col-md-6">
+                        <label for="id_factura" class="form-label">Número de Factura:</label>
+                        <!-- Accede al ID de la factura a través del modelo de detalle de factura -->
+                        <input type="text" id="id_factura" name="id_factura" th:value="${detallesFactura.factura.id_factura}" class="form-control" disabled>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="fecha" class="form-label">Fecha:</label>
+                        <!-- Accede a la fecha de la factura a través del modelo de detalle de factura -->
+                        <input type="date" id="fecha" name="fecha" th:value="${detallesFactura.factura.fecha}" class="form-control" disabled>
+                    </div>
+                </div>
+
+            </div>
+
         </div>
     </form>
 </div>
@@ -45,12 +70,13 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
         crossorigin="anonymous"></script>
-
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 
 <!-- Búsqueda de los Clientes -->
 <script>
     $(document).ready(function() {
+
+        // BUSCADOR
         $("#customer-search").on("input", function() {
             var query = $(this).val();
             if (query.length > 0) {
@@ -67,6 +93,9 @@
                         } else {
                             $("#customer-list").append('<li class="list-group-item no-select">Cliente no encontrado</li>');
                         }
+                    },
+                    error: function(error) {
+                        console.log('Error en la búsqueda de clientes:', error);
                     }
                 });
             } else {
@@ -83,14 +112,47 @@
             $("#cliente").removeClass("is-invalid");
         });
 
-        $("form").on("submit", function(event) {
+        // ACCIÓN AL ABRIR FACTURA
+        $('#abrir-factura').click(function(e) {
+            e.preventDefault();
+
+            // Validar si se ha seleccionado un cliente
             if ($("#cliente").val() === "") {
-                event.preventDefault();
                 $("#cliente").addClass("is-invalid");
+                return;
             }
+
+            // Deshabilitar el buscador y los botones
+            $('#customer-search, #add-customer-btn, #abrir-factura').prop('disabled', true);
+            $('#detalles-section').show();
+
+            // Enviar el formulario vía AJAX
+            var formData = $('#factura-form').serialize();
+
+            $.ajax({
+                url: '/facturacion/factura/abrir',
+                type: 'POST',
+                data: formData,
+                success: function(response) {
+                    if (response.success) {
+                        console.log(response.message);
+                        // Aquí puedes mostrar un mensaje de éxito si es necesario
+                    } else {
+                        console.log(response.message);
+                        // Aquí puedes manejar el error y mostrar un mensaje al usuario
+                    }
+                },
+                error: function(error) {
+                    console.log('Error al abrir la factura:', error);
+                    // Manejar el error de la llamada AJAX
+                },
+                complete: function() {
+                    // Habilitar el campo de búsqueda y los botones después de completar la solicitud AJAX
+                    $('#customer-search, #add-customer-btn, #abrir-factura').prop('disabled', false);
+                }
+            });
         });
     });
 </script>
-
 </body>
 </html>

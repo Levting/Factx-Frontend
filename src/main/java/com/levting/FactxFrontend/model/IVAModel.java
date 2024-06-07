@@ -10,6 +10,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class IVAModel {
     private Integer id_iva;
-    private String nombre;
-    private Float iva;
+    private String iva_nombre;
+    private Double iva;
 }

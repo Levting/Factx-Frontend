@@ -15,17 +15,11 @@
 <body>
 
 <div th:fragment="navbar_vertical">
-    <ul class="list-unstyled">
-        <li class="nav-item mb-2">
-            <a class="nav-link" th:href="@{/productos}">Productos</a>
-        </li>
-        <li class="nav-item mb-2">
-            <a class="nav-link" href="#">Categorías</a>
-        </li>
-        <li class="nav-item mb-2">
-            <a class="nav-link" href="#">Impuesto Valor Agregado (IVA)</a>
-        </li>
-    </ul>
+    <nav class="nav flex-column bg-light">
+        <a class="nav-link active" aria-current="page" th:href="@{/inventario/productos}">Productos</a>
+        <a class="nav-link" th:href="@{/inventario/categorias}">Categorías</a>
+        <a class="nav-link" th:href="@{/inventario/iva}">Impuesto Valor Agregado (IVA)</a>
+    </nav>
 </div>
 </body>
 </html>

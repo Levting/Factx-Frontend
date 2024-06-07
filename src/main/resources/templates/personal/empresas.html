@@ -20,8 +20,8 @@
                  class="img-fluid mb-1" width="200" height="200">-->
         </div>
         <div class="col-md-9 d-flex justify-content-between align-items-center">
-            <h1 class="mb-0">Usuarios</h1>
-            <a th:href="@{/personal/usuarios/crear}" class="btn btn-outline-secondary ms-auto">Nuevo Usuario</a>
+            <h1 class="mb-0">Empresas</h1>
+            <a th:href="@{/personal/empresas/crear}" class="btn btn-outline-secondary ms-auto">Nueva Empresa</a>
         </div>
     </div>
 
@@ -41,27 +41,24 @@
                 <table class="table table-striped table-hover">
                     <thead>
                     <tr>
-                        <th>ID</th>
-                        <th>Nombre</th>
-                        <th>Apellido</th>
-                        <th>Usuario</th>
-                        <th>Empresa</th>
-                        <th>Rol</th>
-                        <th>Acciones</th>
+                        <th>RUC</th>
+                        <th>Nombre Compercial</th>
+                        <th>Dirección</th>
+                        <th>Teléfono</th>
+                        <th>Fase</th>
                     </tr>
                     </thead>
                     <tbody>
-                    <tr th:each="usuario : ${usuarios}">
-                        <td th:text="${usuario.id_usuario}">ID</td>
-                        <td th:text="${usuario.nombre}">Nombre</td>
-                        <td th:text="${usuario.apellido}">Apellido</td>
-                        <td th:text="${usuario.usuario}">Usuario</td>
-                        <td th:text="${usuario.empresa.razon_social}">Empresa</td>
-                        <td th:text="${usuario.rol.rol}">Rol</td>
+                    <tr th:each="empresa : ${empresas}">
+                        <td th:text="${empresa.ruc}">[RUC]</td>
+                        <td th:text="${empresa.nombre_comercial}">[Nomnre Comercial]</td>
+                        <td th:text="${empresa.direccion}">[Direccion]</td>
+                        <td th:text="${empresa.telefono}">[Telefono]</td>
+                        <td th:text="${empresa.desarrollo ? 'Desarrollo' : 'Producción'}">[Fase]</td>
                         <td>
-                            <a th:href="@{/personal/usuarios/editar/{id}(id=${usuario.id_usuario})}"
+                            <a th:href="@{/personal/empresas/editar/{id}(id=${empresa.id_empresa})}"
                                class="btn btn-info btn-sm">Editar</a>
-                            <a th:href="@{/personal/usuarios/{id}(id=${usuario.id_usuario})}"
+                            <a th:href="@{/personal/empresas/{id}(id=${empresa.id_empresa})}"
                                class="btn btn-danger btn-sm">Eliminar</a>
                         </td>
                     </tr>

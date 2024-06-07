@@ -29,7 +29,7 @@
         <div class="col-md-6 offset-md-3">
             <h2 class="mb-4 text-center">Editar Rol</h2>
 
-            <form th:action="@{/roles/{id}(id=${rol.id_rol})}" th:object="${rol}"
+            <form th:action="@{/personal/roles/{id}(id=${rol.id_rol})}" th:object="${rol}"
                   method="post" class="needs-validation" novalidate>
                 <div class="mb-3">
                     <label for="rol" class="form-label">Rol:</label>
@@ -45,7 +45,7 @@
                 </div>
             </form>
             <div class="mt-3 text-center">
-                <a th:href="@{/roles}" class="btn btn-secondary">Volver a la lista de roles</a>
+                <a th:href="@{/personal/roles}" class="btn btn-secondary">Volver a la lista de roles</a>
             </div>
         </div>
     </div>

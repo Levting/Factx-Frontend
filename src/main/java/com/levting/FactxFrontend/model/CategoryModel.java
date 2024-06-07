@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class CategoryModel {
     private Integer id_categoria;
+    private String categoria;
     private IVAModel iva;
     private CompanyModel empresa;
-    private String categoria;
 }

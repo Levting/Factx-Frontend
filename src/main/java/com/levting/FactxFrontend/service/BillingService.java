@@ -1,5 +1,6 @@
 package com.levting.FactxFrontend.service;
 
+import com.levting.FactxFrontend.model.BillDetailModel;
 import com.levting.FactxFrontend.model.BillingModel;
 import com.levting.FactxFrontend.model.CustomerModel;
 import com.levting.FactxFrontend.model.UserModel;
@@ -35,5 +36,16 @@ public class BillingService {
                         .with("cliente", String.valueOf(id_cliente)))
                 .retrieve()
                 .bodyToMono(BillingModel.class);
+    }
+
+    public Mono<BillDetailModel> añadirDetalles(Integer id_factura, Integer id_producto, Integer cantidad_producto){
+        return webClient.post()
+                .uri("/detallesFactura")
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .body(BodyInserters.fromFormData("factura", String.valueOf(id_factura))
+                        .with("producto", String.valueOf(id_producto))
+                        .with("cantidad", String.valueOf(cantidad_producto)))
+                .retrieve()
+                .bodyToMono(BillDetailModel.class);
     }
 }
