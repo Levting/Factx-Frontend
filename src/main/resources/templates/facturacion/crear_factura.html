@@ -247,15 +247,15 @@
                             // Agregar el producto a la tabla de detalles
                             var row = '<tr>' +
                                 '<td class="align-middle">' +
-                                    '<div class="d-flex align-items-center">' +
-                                        '<img src="http://localhost:8080' + product.icono + '" alt="Icono del Producto" class="img-fluid me-2" style="width: 40px; height: 40px;">' +
-                                        '<div>' +
-                                            '<div>' + product.producto + '</div>' +
-                                            '<small class="text-muted">' + product.categoria.categoria + '</small>' +
-                                        '</div>' +
-                                    '</div>' +
+                                '<div class="d-flex align-items-center">' +
+                                '<img src="http://localhost:8080' + product.icono + '" alt="Icono del Producto" class="img-fluid me-2" style="width: 40px; height: 40px;">' +
+                                '<div>' +
+                                '<div>' + product.producto + '</div>' +
+                                '<small class="text-muted">' + product.categoria.categoria + '</small>' +
+                                '</div>' +
+                                '</div>' +
                                 '</td>' +
-                                '<td><input type="number" class="form-control cantidad" name="cantidad" value="1" min="1"></td>' +
+                                '<td><input type="number" class="form-control cantidad" name="cantidad" value="1" min="1" data-stock="' + product.cantidad + '"></td>' +
                                 '<td><input type="number" class="form-control" name="precio" value="' + product.precio + '" disabled></td>' +
                                 '<td class="subtotal">' + product.precio.toFixed(2) + '</td>' + // Subtotal inicial
                                 '<td><button class="btn btn-danger remove-product">Eliminar</button></td>' +
@@ -272,17 +272,26 @@
                 // Evento para actualizar el subtotal cuando cambia la cantidad
                 $(document).on("input", ".cantidad", function () {
                     var row = $(this).closest('tr');
-                    var cantidad = parseFloat($(this).val()); // Convertir a número
-                    var precioUnitario = parseFloat(row.find('input[name="precio"]').val()); // Convertir a número
+                    var cantidad = $(this).val();
+                    var precioUnitario = row.find('input[name="precio"]').val();
+                    var stock = $(this).data("stock");
+
+                    // Verificar si la cantidad ingresada es mayor que el stock
+                    if (parseInt(cantidad) > stock) {
+                        alert("La cantidad ingresada supera la cantidad disponible. Cantidad disponible: " + stock);
+                        $(this).val(stock); // Ajustar la cantidad al máximo disponible
+                        cantidad = stock;
+                    }
+
                     var subtotal = cantidad * precioUnitario;
                     row.find('.subtotal').text(subtotal.toFixed(2));
                 });
 
-                // Función para actualizar los subtotales
+                // Función para actualizar los subtotales (opcional, en caso de que se necesite recalcular en otro momento)
                 function updateSubtotal() {
                     $("#productos-tabla tbody tr").each(function () {
-                        var cantidad = parseFloat($(this).find('input.cantidad').val()); // Convertir a número
-                        var precioUnitario = parseFloat($(this).find('input[name="precio"]').val()); // Convertir a número
+                        var cantidad = $(this).find('input.cantidad').val();
+                        var precioUnitario = $(this).find('input[name="precio"]').val();
                         var subtotal = cantidad * precioUnitario;
                         $(this).find('.subtotal').text(subtotal.toFixed(2));
                     });
