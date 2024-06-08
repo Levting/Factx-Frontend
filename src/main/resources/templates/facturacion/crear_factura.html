@@ -255,13 +255,17 @@
                                 '</div>' +
                                 '</div>' +
                                 '</td>' +
-                                '<td><input type="number" class="form-control cantidad" name="cantidad" value="1" min="1" data-stock="' + product.cantidad + '"></td>' +
-                                '<td><input type="number" class="form-control" name="precio" value="' + product.precio + '" disabled></td>' +
+                                '<td class="align-middle"><input type="number" class="form-control cantidad" name="cantidad" value="1" min="1" data-stock="' + product.cantidad + '"></td>' +
+                                '<td class="align-middle"><input type="number" class="form-control" name="precio" value="' + product.precio + '" disabled></td>' +
                                 '<td class="subtotal">' + product.precio.toFixed(2) + '</td>' + // Subtotal inicial
-                                '<td><button class="btn btn-danger remove-product">Eliminar</button></td>' +
+                                '<td class="align-middle"><button class="btn btn-danger remove-product">Eliminar</button></td>' +
                                 '</tr>';
 
+                            // Agregar la fila a la tabla de productos
                             $("#productos-tabla tbody").append(row);
+
+                            // Limpiar el campo de búsqueda del producto después de agregarlo a la tabla
+                            $("#product-search").val('');
                         },
                         error: function (error) {
                             console.log('Error al obtener los detalles del producto:', error);
