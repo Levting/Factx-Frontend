@@ -246,7 +246,15 @@
                         success: function (product) {
                             // Agregar el producto a la tabla de detalles
                             var row = '<tr>' +
-                                '<td>' + selectedProduct + '</td>' +
+                                '<td class="align-middle">' +
+                                    '<div class="d-flex align-items-center">' +
+                                        '<img src="http://localhost:8080' + product.icono + '" alt="Icono del Producto" class="img-fluid me-2" style="width: 40px; height: 40px;">' +
+                                        '<div>' +
+                                            '<div>' + product.producto + '</div>' +
+                                            '<small class="text-muted">' + product.categoria.categoria + '</small>' +
+                                        '</div>' +
+                                    '</div>' +
+                                '</td>' +
                                 '<td><input type="number" class="form-control cantidad" name="cantidad" value="1" min="1"></td>' +
                                 '<td><input type="number" class="form-control" name="precio" value="' + product.precio + '" disabled></td>' +
                                 '<td class="subtotal">' + product.precio.toFixed(2) + '</td>' + // Subtotal inicial
