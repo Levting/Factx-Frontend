@@ -75,6 +75,12 @@ public class BillingController {
         return productService.obtenerProductoNombreOcurrente(query);
     }
 
+    @GetMapping("/productos/{id}")
+    @ResponseBody
+    public Mono<ProductModel> obtenerProducto(@PathVariable("id") Integer id_producto) {
+        return productService.obtenerProducto(id_producto);
+    }
+
     @PostMapping("/factura/abrir")
     @ResponseBody
     public Mono<Map<String, Object>> abrirFactura(@ModelAttribute("factura") BillingModel billingModel, Model model) {
