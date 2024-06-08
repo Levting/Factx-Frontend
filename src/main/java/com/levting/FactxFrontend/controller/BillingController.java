@@ -1,9 +1,6 @@
 package com.levting.FactxFrontend.controller;
 
-import com.levting.FactxFrontend.model.BillDetailModel;
-import com.levting.FactxFrontend.model.BillingModel;
-import com.levting.FactxFrontend.model.CustomerModel;
-import com.levting.FactxFrontend.model.UserModel;
+import com.levting.FactxFrontend.model.*;
 import com.levting.FactxFrontend.service.BillingService;
 import com.levting.FactxFrontend.service.CustomerService;
 import com.levting.FactxFrontend.service.ProductService;
@@ -27,9 +24,9 @@ public class BillingController {
     private final ProductService productService;
     private final WayPayService wayPayService;
 
-
     @Autowired
-    public BillingController(BillingService billingService, CustomerService customerService, ProductService productService, WayPayService wayPayService) {
+    public BillingController(BillingService billingService, CustomerService customerService,
+            ProductService productService, WayPayService wayPayService) {
         this.billingService = billingService;
         this.customerService = customerService;
         this.productService = productService;
@@ -66,13 +63,17 @@ public class BillingController {
                 .thenReturn("facturacion/crear_factura");
     }
 
-
     @GetMapping("/clientes/buscar")
     @ResponseBody
     public Flux<CustomerModel> buscarClientes(@RequestParam("query") String query) {
         return customerService.obtenerClienteNombreOcurrente(query);
     }
 
+    @GetMapping("/productos/buscar")
+    @ResponseBody
+    public Flux<ProductModel> buscarProductos(@RequestParam("query") String query) {
+        return productService.obtenerProductoNombreOcurrente(query);
+    }
 
     @PostMapping("/factura/abrir")
     @ResponseBody
@@ -93,6 +94,7 @@ public class BillingController {
                         Map<String, Object> response = new HashMap<>();
                         response.put("success", true);
                         response.put("message", "Factura abierta correctamente");
+                        response.put("factura", billingModel);
                         response.put("detalleFactura", billDetailModel);
 
                         return response;
@@ -110,5 +112,4 @@ public class BillingController {
             return Mono.just(response);
         }
     }
-
 }

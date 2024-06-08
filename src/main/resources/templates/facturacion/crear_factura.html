@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport"
@@ -11,14 +12,15 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 </head>
+
 <body>
 
 <div th:insert="~{administradores/navbar_administradores :: navbar}"></div>
 
 <div class="container mt-4">
     <h2 class="mb-4 text-center">Nueva Factura</h2>
-    <form id="factura-form" th:action="@{/facturacion/factura/abrir}" th:object="${factura}" class="needs-validation"
-          method="post" novalidate>
+    <form id="factura-form" th:action="@{/facturacion/factura/abrir}" th:object="${factura}"
+          class="needs-validation" method="post" novalidate>
         <div class="row">
 
             <input type="hidden" id="usuario" name="usuario.id_usuario" th:value="${usuario.id_usuario}"/>
@@ -27,12 +29,13 @@
             <div class="mb-3">
                 <label for="customer-search" class="form-label">Cliente:</label>
                 <div class="input-group">
-                    <input type="text" id="customer-search" class="form-control" placeholder="Escribe para buscar..."
-                           autocomplete="off">
+                    <input type="text" id="customer-search" class="form-control"
+                           placeholder="Escribe para buscar..." autocomplete="off">
                     <button id="add-customer-btn" class="btn btn-outline-secondary" type="button">Añadir</button>
                 </div>
                 <ul id="customer-list" class="list-group" style="display: none;"></ul>
-                <input type="hidden" id="cliente" name="cliente.id_cliente" th:field="*{cliente.id_cliente}" required>
+                <input type="hidden" id="cliente" name="cliente.id_cliente" th:field="*{cliente.id_cliente}"
+                       required>
                 <div class="invalid-feedback">
                     Por favor, seleccione un Cliente.
                 </div>
@@ -44,24 +47,52 @@
             </div>
 
             <!-- Sección de los Detalles -->
-            <div id="detalles-section" style="display: none;">
-                <h4>Detalles de la Factura:</h4>
+            <div id="detalles-section" style="display: none;"><!--style="display: none;"-->
 
+                <h4>Detalles de la Factura:</h4>
                 <div class="row mb-3">
                     <div class="col-md-6">
                         <label for="numero_factura" class="form-label">Número de Factura:</label>
                         <input type="text" id="numero_factura" name="numero_factura" class="form-control" disabled>
                         <!--<input type="text" id="numero_factura" name="numero_factura" class="form-control"
-                               th:value="${factura.numero_factura}" disabled>-->
-
+                           th:value="${factura.numero_factura}" disabled>-->
                     </div>
+
                     <div class="col-md-6">
                         <label for="fecha" class="form-label">Fecha:</label>
                         <input type="text" id="fecha" name="fecha" class="form-control" disabled>
                         <!--<input type="text" id="fecha" name="fecha" class="form-control"
-                               th:value="${#dates.format(detallesFactura.factura.fecha, 'dd/MM/yyyy')}" disabled>-->
+                           th:value="${#dates.format(detallesFactura.factura.fecha, 'dd/MM/yyyy')}" disabled>-->
                     </div>
                 </div>
+
+                <h4>Detalles</h4>
+                <div class="mb-3">
+                    <div class="input-group">
+                        <input type="text" id="product-search" class="form-control"
+                               placeholder="Escribe y Selecciona un Producto a Añadir..." autocomplete="off">
+                    </div>
+                    <ul id="product-list" class="list-group" style="display: none;"></ul>
+                    <!-- <input type="text" id="producto" name="producto.id_producto" class="form-control"> -->
+                    <!-- <input type="hidden" id="producto" name="producto.id_producto"
+                        th:field="*{producto.id_producto}" required> -->
+                </div>
+
+                <table class="table" id="productos-tabla">
+                    <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Cantidad</th>
+                        <th>Precio Unitario</th>
+                        <th>Subtotal</th>
+                        <th>Acciones</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <!-- Filas de productos seleccionados se agregarán aquí dinámicamente -->
+                    </tbody>
+                </table>
+
             </div>
 
         </div>
@@ -76,27 +107,27 @@
 
 <!-- Búsqueda de los Clientes -->
 <script>
-    $(document).ready(function() {
+    $(document).ready(function () {
 
-        // BUSCADOR
-        $("#customer-search").on("input", function() {
+        // BUSCADOR PARA LOS CLIENTES
+        $("#customer-search").on("input", function () {
             var query = $(this).val();
             if (query.length > 0) {
                 $.ajax({
                     url: "/facturacion/clientes/buscar",
                     type: "GET",
                     data: { query: query },
-                    success: function(data) {
+                    success: function (data) {
                         $("#customer-list").empty().show();
                         if (data.length > 0) {
-                            data.forEach(function(customer) {
+                            data.forEach(function (customer) {
                                 $("#customer-list").append('<li class="list-group-item" data-id="' + customer.id_cliente + '">' + customer.nombre + ' ' + customer.apellido + '</li>');
                             });
                         } else {
                             $("#customer-list").append('<li class="list-group-item no-select">Cliente no encontrado</li>');
                         }
                     },
-                    error: function(error) {
+                    error: function (error) {
                         console.log('Error en la búsqueda de clientes:', error);
                     }
                 });
@@ -105,7 +136,8 @@
             }
         });
 
-        $(document).on("click", "#customer-list li:not(.no-select)", function() {
+        // Evento de Seleccion del Cliente
+        $(document).on("click", "#customer-list li:not(.no-select)", function () {
             var selectedCustomer = $(this).text();
             var customerId = $(this).data("id");
             $("#customer-search").val(selectedCustomer);
@@ -115,7 +147,7 @@
         });
 
         // ACCIÓN AL ABRIR FACTURA
-        $('#abrir-factura').click(function(e) {
+        $('#abrir-factura').click(function (e) {
             e.preventDefault();
 
             // Validar si se ha seleccionado un cliente
@@ -135,7 +167,7 @@
                 url: '/facturacion/factura/abrir',
                 type: 'POST',
                 data: formData,
-                success: function(response) {
+                success: function (response) {
                     if (response.success) {
                         // Aquí puedes mostrar un mensaje de éxito si es necesario
                         console.log(response.message);
@@ -150,22 +182,88 @@
                         $("#numero_factura").val(numeroFactura);
                         $("#fecha").val(fechaFactura);
 
+                        // Obtener el producto de la factura del detalle
+                        var producto = response.detalleFactura.producto;
+                        $("#producto").val(producto);
+
+                        // Habilitar búsqueda de productos
+                        initProductSearch();
+
                     } else {
                         console.log(response.message);
                         // Aquí puedes manejar el error y mostrar un mensaje al usuario
                     }
                 },
-                error: function(error) {
+                error: function (error) {
                     console.log('Error al abrir la factura:', error);
                     // Manejar el error de la llamada AJAX
                 },
-                complete: function() {
+                complete: function () {
                     // Habilitar el campo de búsqueda y los botones después de completar la solicitud AJAX
                     // $('#customer-search, #add-customer-btn, #abrir-factura').prop('disabled', false);
                 }
             });
         });
+
+        function initProductSearch() {
+
+            console.log('initProductSearch() se ha ejecutado');
+
+            // BUSCADOR PARA LOS PRODUCTOS
+            $("#product-search").on("input", function () {
+                var query = $(this).val();
+                if (query.length > 0) {
+                    $.ajax({
+                        url: "/facturacion/productos/buscar",
+                        type: "GET",
+                        data: { query: query },
+                        success: function (data) {
+                            $("#product-list").empty().show();
+                            if (data.length > 0) {
+                                data.forEach(function (product) {
+                                    $("#product-list").append('<li class="list-group-item" data-id="' + product.id_producto + '">' + product.producto + '</li>');
+                                });
+                            } else {
+                                $("#product-list").append('<li class="list-group-item no-select">Producto no encontrado</li>');
+                            }
+                        },
+                        error: function (error) {
+                            console.log('Error en la búsqueda de productos:', error);
+                        }
+                    });
+                } else {
+                    $("#product-list").hide();
+                }
+            });
+
+            // Evento de Seleccion del Producto
+            $(document).on("click", "#product-list li:not(.no-select)", function () {
+                var selectedProduct = $(this).text();
+                var productId = $(this).data("id");
+                $("#product-search").val(selectedProduct);
+                $("#producto").val(productId);
+                $("#product-list").hide();
+                //$("#producto").removeClass("is-invalid");
+
+                // Agregar el producto a la tabla de detalles
+                var row = '<tr>' +
+                    '<td>' + selectedProduct + '</td>' +
+                    '<td><input type="number" class="form-control" name="cantidad" value="1"></td>' +
+                    '<td><input type="number" class="form-control" name="precio_unitario" value="0.00"></td>' +
+                    '<td>0.00</td>' +
+                    '<td><button class="btn btn-danger remove-product">Eliminar</button></td>' +
+                    '</tr>';
+
+                $("#productos-tabla tbody").append(row);
+            });
+
+            // Evento para eliminar un producto de la tabla
+            $(document).on("click", ".remove-product", function () {
+                $(this).closest('tr').remove();
+            });
+        }
     });
 </script>
 </body>
+
 </html>

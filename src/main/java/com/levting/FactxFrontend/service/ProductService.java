@@ -1,5 +1,6 @@
 package com.levting.FactxFrontend.service;
 
+import com.levting.FactxFrontend.model.CustomerModel;
 import com.levting.FactxFrontend.model.ProductModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -10,8 +11,6 @@ import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.io.File;
 
 
 @Service
@@ -65,7 +64,12 @@ public class ProductService {
                 .bodyToMono(Void.class);
     }
 
-
+    public Flux<ProductModel> obtenerProductoNombreOcurrente(String nombre) {
+        return webClient.get()
+                .uri("/producto/query?nombre={nombre}", nombre)
+                .retrieve()
+                .bodyToFlux(ProductModel.class);
+    }
 }
 
 
