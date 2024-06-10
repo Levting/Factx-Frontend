@@ -26,7 +26,7 @@ public class BillingController {
 
     @Autowired
     public BillingController(BillingService billingService, CustomerService customerService,
-            ProductService productService, WayPayService wayPayService) {
+                             ProductService productService, WayPayService wayPayService) {
         this.billingService = billingService;
         this.customerService = customerService;
         this.productService = productService;
@@ -69,17 +69,6 @@ public class BillingController {
         return customerService.obtenerClienteNombreOcurrente(query);
     }
 
-    @GetMapping("/productos/buscar")
-    @ResponseBody
-    public Flux<ProductModel> buscarProductos(@RequestParam("query") String query) {
-        return productService.obtenerProductoNombreOcurrente(query);
-    }
-
-    @GetMapping("/productos/{id}")
-    @ResponseBody
-    public Mono<ProductModel> obtenerProducto(@PathVariable("id") Integer id_producto) {
-        return productService.obtenerProducto(id_producto);
-    }
 
     @PostMapping("/factura/abrir")
     @ResponseBody
@@ -117,5 +106,41 @@ public class BillingController {
             response.put("message", "Usuario o Cliente no encontrado.");
             return Mono.just(response);
         }
+    }
+
+    @GetMapping("/productos/buscar")
+    @ResponseBody
+    public Flux<ProductModel> buscarProductos(@RequestParam("query") String query) {
+        return productService.obtenerProductoNombreOcurrente(query);
+    }
+
+    @GetMapping("/productos/{id}")
+    @ResponseBody
+    public Mono<ProductModel> obtenerProducto(@PathVariable("id") Integer id_producto) {
+        return productService.obtenerProducto(id_producto);
+    }
+
+    @PostMapping("/factura/detalle")
+    @ResponseBody
+    public Mono<Map<String, Object>> añadirDetalleFactura(@RequestBody Map<String, Object> payload) {
+
+        Integer facturaID = Integer.parseInt(payload.get("facturaID").toString());
+        Integer productoID = Integer.parseInt(payload.get("productoID").toString());
+        Integer cantidad = Integer.parseInt(payload.get("cantidad").toString());
+
+        return billingService.anadirDetalles(facturaID, productoID, cantidad)
+                .map(detalle -> {
+                    Map<String, Object> response = new HashMap<>();
+                    response.put("success", true);
+                    response.put("detalle", detalle);
+                    return response;
+                })
+                .onErrorResume(error -> {
+                    Map<String, Object> response = new HashMap<>();
+                    response.put("success", false);
+                    response.put("message", "Error al añadir el detalle a la factura: " + error.getMessage());
+                    return Mono.just(response);
+                });
+
     }
 }

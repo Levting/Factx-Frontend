@@ -49,20 +49,22 @@
                 <!-- Sección de los Detalles -->
                 <div id="detalles-section" style="display: none;"><!--style="display: none;"-->
 
+                    <input type="hidden" id="id_factura" name="id_factura" />
+
                     <h4>Detalles de la Factura:</h4>
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label for="numero_factura" class="form-label">Número de Factura:</label>
                             <input type="text" id="numero_factura" name="numero_factura" class="form-control" disabled>
                             <!--<input type="text" id="numero_factura" name="numero_factura" class="form-control"
-                           th:value="${factura.numero_factura}" disabled>-->
+                       th:value="${factura.numero_factura}" disabled>-->
                         </div>
 
                         <div class="col-md-6">
                             <label for="fecha" class="form-label">Fecha:</label>
                             <input type="text" id="fecha" name="fecha" class="form-control" disabled>
                             <!--<input type="text" id="fecha" name="fecha" class="form-control"
-                           th:value="${#dates.format(detallesFactura.factura.fecha, 'dd/MM/yyyy')}" disabled>-->
+                       th:value="${#dates.format(detallesFactura.factura.fecha, 'dd/MM/yyyy')}" disabled>-->
                         </div>
                     </div>
 
@@ -74,8 +76,7 @@
                         </div>
                         <ul id="product-list" class="list-group" style="display: none;"></ul>
                         <!-- <input type="text" id="producto" name="producto.id_producto" class="form-control"> -->
-                        <!-- <input type="hidden" id="producto" name="producto.id_producto"
-                        th:field="*{producto.id_producto}" required> -->
+                        <!-- <input type="hidden" id="producto" name="producto.id_producto" th:field="*{producto.id_producto}" required> -->
                     </div>
 
                     <table class="table" id="productos-tabla">
@@ -169,16 +170,13 @@
                     data: formData,
                     success: function (response) {
                         if (response.success) {
-                            // Aquí puedes mostrar un mensaje de éxito si es necesario
-                            console.log(response.message);
-
                             // Obtener el numero de la factura del detalle
+                            var id_factura = response.detalleFactura.factura.idFactura;
                             var numeroFactura = response.detalleFactura.factura.numero_factura;
-
-                            // Obtener la fecha de la factura abierta
                             var fechaFactura = response.detalleFactura.factura.fecha;
 
                             // Asignar el número de factura y la fecha al div oculto
+                            $("#id_factura").val(id_factura);
                             $("#numero_factura").val(numeroFactura);
                             $("#fecha").val(fechaFactura);
 
@@ -237,7 +235,6 @@
                     $("#product-search").val(selectedProduct);
                     $("#producto").val(productId);
                     $("#product-list").hide();
-                    //$("#producto").removeClass("is-invalid");
 
                     // Realizar una solicitud AJAX para obtener los detalles del producto seleccionado
                     $.ajax({
@@ -246,7 +243,7 @@
                         success: function (product) {
                             // Agregar el producto a la tabla de detalles
                             var row = '<tr>' +
-                                '<td class="align-middle">' +
+                                '<td class="align-middle" data-id="' + product.id_producto + '">' +
                                 '<div class="d-flex align-items-center">' +
                                 '<img src="http://localhost:8080' + product.icono + '" alt="Icono del Producto" class="img-fluid me-2" style="width: 40px; height: 40px;">' +
                                 '<div>' +
@@ -258,7 +255,10 @@
                                 '<td class="align-middle"><input type="number" class="form-control cantidad" name="cantidad" value="1" min="1" data-stock="' + product.cantidad + '"></td>' +
                                 '<td class="align-middle"><input type="number" class="form-control" name="precio" value="' + product.precio + '" disabled></td>' +
                                 '<td class="subtotal">' + product.precio.toFixed(2) + '</td>' + // Subtotal inicial
-                                '<td class="align-middle"><button class="btn btn-danger remove-product">Eliminar</button></td>' +
+                                '<td class="align-middle">' +
+                                '<button class="btn btn-success add-billDetail">Añadir a la Factura</button> ' +
+                                '<button class="btn btn-danger remove-product">Eliminar</button>' +
+                                '</td>' +
                                 '</tr>';
 
                             // Agregar la fila a la tabla de productos
@@ -291,15 +291,47 @@
                     row.find('.subtotal').text(subtotal.toFixed(2));
                 });
 
-                // Función para actualizar los subtotales (opcional, en caso de que se necesite recalcular en otro momento)
-                function updateSubtotal() {
-                    $("#productos-tabla tbody tr").each(function () {
-                        var cantidad = $(this).find('input.cantidad').val();
-                        var precioUnitario = $(this).find('input[name="precio"]').val();
-                        var subtotal = cantidad * precioUnitario;
-                        $(this).find('.subtotal').text(subtotal.toFixed(2));
+                // Evento para añadir detalle en la factura
+                $(document).on("click", ".add-billDetail", function () {
+                    event.preventDefault(); // Previene el comportamiento por defecto del formulario
+                    var row = $(this).closest('tr'); // Obtener la fila actual
+                    var facturaID = $("#id_factura").val(); // Obtener el ID de la factura
+                    var productoID = row.find('td:first-child').data('id'); // Corregir para obtener el ID del producto
+                    var cantidad = row.find('input.cantidad').val(); // Obtener la cantidad
+
+                    // Mostrar los valores de la factura, producto y cantidad
+                    console.log('Consola Factura ID:', facturaID);
+                    console.log('Consola Producto ID:', productoID);
+                    console.log('Consola Cantidad:', cantidad);
+
+                    // Realizar una solicitud AJAX para añadir el detalle a la factura
+                    $.ajax({
+                        url: "/facturacion/factura/detalle",
+                        type: "POST",
+                        contentType: "application/json", // Especificar que se enviarán datos JSON
+                        data: JSON.stringify({
+                            facturaID: facturaID,
+                            productoID: productoID,
+                            cantidad: cantidad
+                        }),
+                        success: function (response) {
+                            if (response.success) {
+                                // Deshabilitar el botón de añadir y el botón de eliminar
+                                row.find('.add-billDetail').prop('disabled', true);
+                                row.find('.remove-product').prop('disabled', true);
+                                row.find('.cantidad').prop('disabled', true);
+                                
+                            } else {
+                                // Aquí puedes manejar el error y mostrar un mensaje al usuario
+                                console.log(response.message);
+                            }
+                        },
+                        error: function (error) {
+                            console.log('Error al añadir el detalle a la factura:', error);
+                        }
                     });
-                }
+
+                });
 
                 // Evento para eliminar un producto de la tabla
                 $(document).on("click", ".remove-product", function () {

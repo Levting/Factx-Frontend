@@ -2,8 +2,6 @@ package com.levting.FactxFrontend.service;
 
 import com.levting.FactxFrontend.model.BillDetailModel;
 import com.levting.FactxFrontend.model.BillingModel;
-import com.levting.FactxFrontend.model.CustomerModel;
-import com.levting.FactxFrontend.model.UserModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -46,9 +44,9 @@ public class BillingService {
     }
 
 
-    public Mono<BillDetailModel> añadirDetalles(Integer id_factura, Integer id_producto, Integer cantidad_producto){
+    public Mono<BillDetailModel> anadirDetalles(Integer id_factura, Integer id_producto, Integer cantidad_producto){
         return webClient.post()
-                .uri("/detallesFactura")
+                .uri("/detalleFactura")
                 .contentType(MediaType.MULTIPART_FORM_DATA)
                 .body(BodyInserters.fromFormData("factura", String.valueOf(id_factura))
                         .with("producto", String.valueOf(id_producto))
