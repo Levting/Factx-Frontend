@@ -48,7 +48,8 @@
                     <!-- Botón para abrir la factura -->
                     <div class="d-flex justify-content-end">
                         <button type="submit" id="abrir-factura" class="btn btn-outline-secondary ms-auto"
-                            th:disabled="${facturaAbierta}">Abrir Factura</button>
+                            th:disabled="${facturaAbierta}">Abrir Factura
+                        </button>
                     </div>
                 </form>
 
@@ -107,22 +108,36 @@
                 </div>
             </div>
 
-            <!-- Forma de Pago -->
-            <div th:if="${facturaAbierta}" th:object="${detalle}" class="col-md-4">
-                <h3>Forma de Pago</h3>
-                <!-- Cargar las formas de pago desde el controlador -->
-                <div class="mb-3">
-                    <label for="forma_pago" class="form-label">Forma de Pago:</label>
-                    <select id="forma_pago" name="factura.formaPago.id_forma_pago"
-                        th:field="*{factura.formaPago.id_forma_pago}" class="form-select" required>
-                        <option value="" selected>Selecciona una Forma de Pago</option>
-                        <option th:each="forma_pago : ${formas_pago}" th:value="${forma_pago.id_forma_pago}"
-                            th:text="${forma_pago.forma_pago}"></option>
-                    </select>
-                    <div class="invalid-feedback">
-                        Por favor, seleccione una Forma de Pago.
+            <div th:if="${facturaAbierta}" class="col-md-4">
+                <form th:action="@{/facturacion/factura/cerrar}" method="post" th:object="${detalle}">
+
+                    <input id="id_factura_cerrar" name="factura.idFactura" th:value="${factura.idFactura}"
+                        type="hidden" />
+
+                    <h3>Forma de Pago</h3>
+                    <!-- Cargar las formas de pago desde el controlador -->
+                    <div class="mb-3">
+                        <label for="forma_pago" class="form-label">Forma de Pago:</label>
+                        <select id="forma_pago" name="formaPago.id_forma_pago" class="form-select" required>
+                            <option value="" selected>Selecciona una Forma de Pago</option>
+                            <option th:each="forma_pago : ${formas_pago}" th:value="${forma_pago.id_forma_pago}"
+                                th:text="${forma_pago.forma_pago}"></option>
+                        </select>
+                        <div class="invalid-feedback">
+                            Por favor, seleccione una Forma de Pago.
+                        </div>
                     </div>
-                </div>
+
+                    <div class="mt-5">
+                        <p>Subtotal: <span id="subtotal-factura">0.00</span></p>
+                        <p>Total IVA: <span id="total-iva-factura">0.00</span></p>
+                        <h6>Total a Pagar: <span id="total-factura">0.00</span></h6>
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">Guardar</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -133,9 +148,11 @@
         crossorigin="anonymous"></script>
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 
-    <!-- Búsqueda de los Clientes -->
+
     <script>
         $(document).ready(function () {
+            var totalSubtotalProductos = 0;
+            var totalIVA = 0;
 
             // Buscador de Clientes
             $("#customer-search").on("input", function () {
@@ -164,14 +181,14 @@
                 }
             });
 
-            // Evento de Seleccion del Cliente
+            // Evento de Selección del Cliente
             $(document).on("click", "#customer-list li:not(.no-select)", function () {
-                var selectedCustomer = $(this).text(); // Nombre del Cliente seleccionado
-                var customerId = $(this).data("id"); // ID del Cliente seleccionado
-                $("#customer-search").val(selectedCustomer); // Mostrar el nombre del Cliente en el input
-                $("#cliente").val(customerId); // Asignar el ID del Cliente al campo oculto
-                $("#customer-list").hide(); // Ocultar la lista de Clientes
-                $("#cliente").removeClass("is-invalid"); // Remover la clase de error
+                var selectedCustomer = $(this).text();
+                var customerId = $(this).data("id");
+                $("#customer-search").val(selectedCustomer);
+                $("#cliente").val(customerId);
+                $("#customer-list").hide();
+                $("#cliente").removeClass("is-invalid");
             });
 
             // Buscador de Productos
@@ -201,17 +218,15 @@
                 }
             });
 
-            // Evento de Seleccion del Producto y Agregar a la Tabla
+            // Evento de Selección del Producto y Agregar a la Tabla
             $(document).on("click", "#product-list li:not(.no-select)", function () {
-                var selectedProduct = $(this).text(); // Nombre del Producto seleccionado
-                var productId = $(this).data("id"); // ID del Producto seleccionado
-                $("#product-search").val(selectedProduct); // Mostrar el nombre del Producto en el input
-                $("#producto").val(productId); // Asignar el ID del Producto al campo oculto
-                $("#product-list").hide(); // Ocultar la lista de Productos
+                var selectedProduct = $(this).text();
+                var productId = $(this).data("id");
+                $("#product-search").val(selectedProduct);
+                $("#producto").val(productId);
+                $("#product-list").hide();
 
                 if (productId) {
-
-                    // Obtener el modelo del producto a partir del ID
                     $.ajax({
                         url: "/facturacion/productos/" + productId,
                         type: "GET",
@@ -228,16 +243,16 @@
                                 '</td>' +
                                 '<td class="align-middle"><input type="number" class="form-control cantidad" name="cantidad" value="1" min="1" data-stock="' + producto.cantidad + '"></td>' +
                                 '<td class="align-middle"><input type="number" class="form-control" name="precio" value="' + producto.precio + '" disabled></td>' +
-                                '<td class="align-middle subtotal">' + producto.precio.toFixed(2) + '</td>' + // Subtotal inicial
+                                '<td class="align-middle subtotal">' + producto.precio.toFixed(2) + '</td>' +
                                 '<td class="align-middle">' +
-                                '<button class="btn btn-success add-billDetail" data-producto-id="' + producto.id_producto + '">Añadir a la Factura</button> ' + // Cambiado a data-producto-id
+                                '<button class="btn btn-success add-billDetail" data-producto-id="' + producto.id_producto + '">Añadir a la Factura</button> ' +
                                 '<button class="btn btn-danger remove-product-btn">Eliminar</button>' +
                                 '</td>' +
                                 '</tr>';
 
-                            $("#productos-tabla").append(row); // Agregar la fila a la tabla
-                            $("#product-search").val(''); // Limpiar el campo de búsqueda
-                            $("#producto").val(''); // Limpiar el campo oculto
+                            $("#productos-tabla").append(row);
+                            $("#product-search").val('');
+                            $("#producto").val('');
                         },
                         error: function (error) {
                             console.log('Error al obtener el producto:', error);
@@ -254,10 +269,9 @@
                     var precioUnitario = row.find('input[name="precio"]').val();
                     var stock = $(this).data("stock");
 
-                    // Verificar si la cantidad ingresada es mayor que el stock
                     if (parseInt(cantidad) > stock) {
                         alert("La cantidad ingresada supera la cantidad disponible. Cantidad disponible: " + stock);
-                        $(this).val(stock); // Ajustar la cantidad al máximo disponible
+                        $(this).val(stock);
                         cantidad = stock;
                     }
 
@@ -271,23 +285,29 @@
                 $(this).closest("tr").remove();
             });
 
-            // Agregar Detalle a la Factura
-            $(document).on("click", ".add-billDetail", function () {
-                event.preventDefault(); // Previene el comportamiento por defecto del formulario
-                var row = $(this).closest('tr'); // Obtener la fila actual
-                var facturaID = $("#id_factura").val(); // Obtener el ID de la factura
-                var productoID = $(this).data('producto-id'); // Obtener el ID del producto del atributo data-producto-id del botón
-                var cantidad = row.find('input.cantidad').val(); // Obtener la cantidad
+            // Agregar Detalle a la Factura y actualizar los valores
+            $(document).on("click", ".add-billDetail", function (event) {
+                event.preventDefault();
+                var row = $(this).closest('tr');
+                var facturaID = $("#id_factura").val();
+                var productoID = $(this).data('producto-id');
+                var cantidad = row.find('input.cantidad').val();
+                var stock = row.find('input.cantidad').data('stock');
 
                 if (facturaID == null || productoID == null || cantidad == null) {
                     alert("Por favor, complete todos los campos.");
                     return;
                 }
 
+                if (parseInt(cantidad) > stock) {
+                    alert("No se puede añadir el producto. La cantidad ingresada supera la cantidad disponible.");
+                    return;
+                }
+
                 $.ajax({
                     url: "/facturacion/factura/detalle",
                     type: "POST",
-                    contentType: "application/json", // Asegura que el contenido sea JSON
+                    contentType: "application/json",
                     data: JSON.stringify({
                         id_factura: facturaID,
                         id_producto: productoID,
@@ -295,13 +315,19 @@
                     }),
                     success: function (data) {
                         console.log('Detalle agregado:', data);
-                        // Deshabilitar el botón de añadir y el botón de eliminar
                         row.find('.add-billDetail').prop('disabled', true);
                         row.find('.remove-product-btn').prop('disabled', true);
                         row.find('.cantidad').prop('disabled', true);
 
-                        // Añadir el 
+                        var subtotalProducto = parseFloat(data.detalle.subtotal_producto);
+                        var ivaProducto = parseFloat(data.detalle.total_iva);
 
+                        totalSubtotalProductos += subtotalProducto;
+                        totalIVA += ivaProducto;
+
+                        $("#subtotal-factura").text(totalSubtotalProductos.toFixed(2));
+                        $("#total-iva-factura").text(totalIVA.toFixed(2));
+                        $("#total-factura").text((totalSubtotalProductos + totalIVA).toFixed(2));
                     },
                     error: function (error) {
                         console.log('Error al agregar el detalle:', error);
@@ -310,6 +336,7 @@
             });
         });
     </script>
+
 </body>
 
 </html>

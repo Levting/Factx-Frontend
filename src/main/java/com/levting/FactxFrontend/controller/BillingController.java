@@ -6,7 +6,6 @@ import com.levting.FactxFrontend.service.CustomerService;
 import com.levting.FactxFrontend.service.ProductService;
 import com.levting.FactxFrontend.service.WayPayService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.Banner;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -114,10 +113,6 @@ public class BillingController {
         Integer productoID = Integer.parseInt(detalleFactura.get("id_producto"));
         Integer cantidad = Integer.parseInt(detalleFactura.get("cantidad"));
 
-        System.out.println("Factura ID: " + facturaID);
-        System.out.println("Producto ID: " + productoID);
-        System.out.println("Cantidad: " + cantidad);
-
         return billingService.anadirDetalles(facturaID, productoID, cantidad)
                 .map(detalle -> {
                     Map<String, Object> response = new HashMap<>();
@@ -132,4 +127,13 @@ public class BillingController {
                     return Mono.just(response);
                 });
     }
+
+    @PostMapping("/factura/cerrar")
+    public void cerrarFactura(@ModelAttribute("detalle") BillDetailModel billDetailModel, Model model) {
+        System.out.println("Detalles de la Factura: " + billDetailModel);
+        int idFactura = billDetailModel.getFactura().getIdFactura();
+        int idFormaPago = billDetailModel.getFactura().getFormaPago().getId_forma_pago();
+        System.out.println("Factura Cerrada: ID Factura = " + idFactura + ", ID Forma de Pago = " + idFormaPago);
+    }
+
 }
