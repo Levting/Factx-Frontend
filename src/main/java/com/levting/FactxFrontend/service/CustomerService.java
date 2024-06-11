@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Service
 public class CustomerService {
@@ -21,6 +22,13 @@ public class CustomerService {
                 .retrieve()
                 .bodyToFlux(CustomerModel.class);
 
+    }
+
+    public Mono<CustomerModel> obtenerCliente(Integer id_cliente) {
+        return webClient.get()
+                .uri("/cliente/{id}", id_cliente)
+                .retrieve()
+                .bodyToMono(CustomerModel.class);
     }
 
     public Flux<CustomerModel> obtenerClienteNombreOcurrente(String nombre) {

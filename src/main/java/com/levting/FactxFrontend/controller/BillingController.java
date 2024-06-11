@@ -6,6 +6,7 @@ import com.levting.FactxFrontend.service.CustomerService;
 import com.levting.FactxFrontend.service.ProductService;
 import com.levting.FactxFrontend.service.WayPayService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.Banner;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -69,43 +70,28 @@ public class BillingController {
         return customerService.obtenerClienteNombreOcurrente(query);
     }
 
-
     @PostMapping("/factura/abrir")
-    @ResponseBody
-    public Mono<Map<String, Object>> abrirFactura(@ModelAttribute("factura") BillingModel billingModel, Model model) {
-        UserModel usuario = (UserModel) model.getAttribute("usuario");
-        if (usuario != null && billingModel.getCliente() != null) {
-            int id_usuario = usuario.getId_usuario();
-            int id_cliente = billingModel.getCliente().getId_cliente();
+    public Mono<String> facturaAbierta(@ModelAttribute("factura") BillingModel billingModel, Model model) {
+        Integer id_usuario = billingModel.getUsuario().getId_usuario();
+        Integer id_cliente = billingModel.getCliente().getId_cliente();
 
-            return billingService.abrirFactura(id_usuario, id_cliente)
-                    .map(factura -> {
+        model.addAttribute("facturaAbierta", true);
 
-                        // Crear el modelo del detalle y guardarlo en el modelo de la vista
-                        BillDetailModel billDetailModel = new BillDetailModel();
-                        billDetailModel.setFactura(factura); // Usar la factura retornada por el servicio
+        return billingService.abrirFactura(id_usuario, id_cliente)
+                .flatMap(facturaAbierta -> {
+                    BillDetailModel billDetailModel = new BillDetailModel();
+                    billDetailModel.setFactura(facturaAbierta);
+                    model.addAttribute("factura", facturaAbierta);
+                    model.addAttribute("detalle", billDetailModel);
 
-                        // Devolver el ID de la factura y el detalle de la factura como respuesta
-                        Map<String, Object> response = new HashMap<>();
-                        response.put("success", true);
-                        response.put("message", "Factura abierta correctamente");
-                        response.put("factura", billingModel);
-                        response.put("detalleFactura", billDetailModel);
-
-                        return response;
-                    })
-                    .onErrorResume(error -> {
-                        Map<String, Object> response = new HashMap<>();
-                        response.put("success", false);
-                        response.put("message", "Error al abrir la factura: " + error.getMessage());
-                        return Mono.just(response);
-                    });
-        } else {
-            Map<String, Object> response = new HashMap<>();
-            response.put("success", false);
-            response.put("message", "Usuario o Cliente no encontrado.");
-            return Mono.just(response);
-        }
+                    // Obtener el cliente y añadirlo al modelo
+                    return customerService.obtenerCliente(id_cliente)
+                            .doOnNext(clienteModel -> model.addAttribute("cliente", clienteModel))
+                            .then(productService.obtenerProductos().collectList()
+                                    .doOnNext(productos -> model.addAttribute("productos", productos)))
+                            .then(wayPayService.obtenerFormasPago().collectList()
+                                    .doOnNext(formas_pago -> model.addAttribute("formas_pago", formas_pago)));
+                }).thenReturn("facturacion/crear_factura");
     }
 
     @GetMapping("/productos/buscar")
@@ -122,11 +108,15 @@ public class BillingController {
 
     @PostMapping("/factura/detalle")
     @ResponseBody
-    public Mono<Map<String, Object>> añadirDetalleFactura(@RequestBody Map<String, Object> payload) {
+    public Mono<Map<String, Object>> añadirDetalleFactura(@RequestBody Map<String, String> detalleFactura) {
 
-        Integer facturaID = Integer.parseInt(payload.get("facturaID").toString());
-        Integer productoID = Integer.parseInt(payload.get("productoID").toString());
-        Integer cantidad = Integer.parseInt(payload.get("cantidad").toString());
+        Integer facturaID = Integer.parseInt(detalleFactura.get("id_factura"));
+        Integer productoID = Integer.parseInt(detalleFactura.get("id_producto"));
+        Integer cantidad = Integer.parseInt(detalleFactura.get("cantidad"));
+
+        System.out.println("Factura ID: " + facturaID);
+        System.out.println("Producto ID: " + productoID);
+        System.out.println("Cantidad: " + cantidad);
 
         return billingService.anadirDetalles(facturaID, productoID, cantidad)
                 .map(detalle -> {
@@ -141,6 +131,5 @@ public class BillingController {
                     response.put("message", "Error al añadir el detalle a la factura: " + error.getMessage());
                     return Mono.just(response);
                 });
-
     }
 }
