@@ -53,14 +53,15 @@
                     </div>
                 </form>
 
-                <!-- Cuando se abre la factura, se desabilitan el buscador para dar paso al detalle -->
+                <!-- Cuando se abre la factura, se desabilitan el buscador para dar paso al detalle de la factura -->
+                <!-- Obtener el detalle de la factura desde el controlador -->
                 <div th:if="${facturaAbierta}" th:object="${detalle}">
 
                     <!-- Factura obtenida desde el controlador -->
                     <input type="hidden" id="id_factura" name="id_factura" th:value="${factura.idFactura}" />
 
                     <h4>Detalles de la Factura</h4>
-                    <!-- Obtenemos los datos de la factura desde el detalle, el numero de la factura generado y la fecha -->
+                    <!-- Obtenemos los datos de la factura desde el detalle, el numero de la factura y la fecha -->
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label for="numero_factura" class="form-label">Número de Factura:</label>
@@ -109,12 +110,13 @@
             </div>
 
             <div th:if="${facturaAbierta}" class="col-md-4">
-                <form th:action="@{/facturacion/factura/cerrar}" method="post" th:object="${detalle}">
+                <form th:action="@{/facturacion/factura/cerrar}" method="post" th:object="${factura}">
 
-                    <input id="id_factura_cerrar" name="factura.idFactura" th:value="${factura.idFactura}"
-                        type="hidden" />
+                    <!-- ID de la factura obtenida desde el objeto-->
+                    <input type="hidden" th:field="*{idFactura}" th:value="${factura.idFactura}" />
 
-                    <h3>Forma de Pago</h3>
+                    <h3 class="mb-4">Forma de Pago</h3>
+
                     <!-- Cargar las formas de pago desde el controlador -->
                     <div class="mb-3">
                         <label for="forma_pago" class="form-label">Forma de Pago:</label>
@@ -128,13 +130,13 @@
                         </div>
                     </div>
 
-                    <div class="mt-5">
-                        <p>Subtotal: <span id="subtotal-factura">0.00</span></p>
-                        <p>Total IVA: <span id="total-iva-factura">0.00</span></p>
+                    <div class="mt-4">
+                        <p class="mb-2">Subtotal: <span id="subtotal-factura">0.00</span></p>
+                        <p class="mb-2">Total IVA: <span id="total-iva-factura">0.00</span></p>
                         <h6>Total a Pagar: <span id="total-factura">0.00</span></h6>
                     </div>
 
-                    <div class="d-grid">
+                    <div class="d-grid mt-4">
                         <button type="submit" class="btn btn-primary">Guardar</button>
                     </div>
                 </form>

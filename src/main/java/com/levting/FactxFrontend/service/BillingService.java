@@ -36,15 +36,14 @@ public class BillingService {
                 .bodyToMono(BillingModel.class);
     }
 
-    public Mono<BillingModel> obtenerFactura(Integer id_factura){
+    public Mono<BillingModel> obtenerFactura(Integer id_factura) {
         return webClient.get()
                 .uri("/factura/{id}", id_factura)
                 .retrieve()
                 .bodyToMono(BillingModel.class);
     }
 
-
-    public Mono<BillDetailModel> anadirDetalles(Integer id_factura, Integer id_producto, Integer cantidad_producto){
+    public Mono<BillDetailModel> anadirDetalles(Integer id_factura, Integer id_producto, Integer cantidad_producto) {
         return webClient.post()
                 .uri("/detalleFactura")
                 .contentType(MediaType.MULTIPART_FORM_DATA)
@@ -53,5 +52,15 @@ public class BillingService {
                         .with("cantidad", String.valueOf(cantidad_producto)))
                 .retrieve()
                 .bodyToMono(BillDetailModel.class);
+    }
+
+    public Mono<BillingModel> cerrarFactura(Integer id_factura, Integer id_forma_pago) {
+        return webClient.post()
+                .uri("/factura/cerrar")
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .body(BodyInserters.fromFormData("factura", String.valueOf(id_factura))
+                        .with("pago", String.valueOf(id_forma_pago)))
+                .retrieve()
+                .bodyToMono(BillingModel.class);
     }
 }
