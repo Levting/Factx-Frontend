@@ -27,12 +27,15 @@
             <div class="card">
                 <div class="card-header text-center">
                     <h2>Iniciar sesión</h2>
+                    <div th:if="${session.message}">
+                        <p th:text="${session.message}"></p>
+                    </div>
                 </div>
                 <div class="card-body">
                     <form th:action="@{/inicio_sesion}" method="post">
                         <div class="mb-3">
                             <label for="usuario" class="form-label">Usuario</label>
-                            <input type="text" class="form-control" id="usuario" name="usuario" required>
+                            <input type="text" class="form-control" id="usuario" name="usuario" autocomplete="off" required>
                         </div>
                         <div class="mb-3">
                             <label for="contrasena" class="form-label">Contraseña</label>
