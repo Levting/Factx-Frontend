@@ -9,6 +9,7 @@ import reactor.core.publisher.Mono;
 
 @Service
 public class CustomerService {
+
     private final WebClient webClient;
 
     @Autowired
@@ -16,6 +17,11 @@ public class CustomerService {
         this.webClient = webClient;
     }
 
+    /**
+     * Método para obtener los clientes
+     * 
+     * @return
+     */
     public Flux<CustomerModel> obtenerClientes() {
         return webClient.get()
                 .uri("/cliente")
@@ -24,6 +30,12 @@ public class CustomerService {
 
     }
 
+    /**
+     * Método para obtener un cliente
+     * 
+     * @param id_cliente
+     * @return
+     */
     public Mono<CustomerModel> obtenerCliente(Integer id_cliente) {
         return webClient.get()
                 .uri("/cliente/{id}", id_cliente)
@@ -31,10 +43,43 @@ public class CustomerService {
                 .bodyToMono(CustomerModel.class);
     }
 
+    /**
+     * Método para obtener un cliente escribiendo su nombre
+     * 
+     * @param nombre
+     * @return
+     */
     public Flux<CustomerModel> obtenerClienteNombreOcurrente(String nombre) {
         return webClient.get()
                 .uri("/cliente/query?nombre={nombre}", nombre)
                 .retrieve()
                 .bodyToFlux(CustomerModel.class);
+    }
+
+    /**
+     * Método para guardar un cliente
+     * 
+     * @param customerModel
+     * @return
+     */
+    public Mono<CustomerModel> guardarCliente(CustomerModel customerModel) {
+        return webClient.post()
+                .uri("/cliente")
+                .bodyValue(customerModel)
+                .retrieve()
+                .bodyToMono(CustomerModel.class);
+    }
+
+    /**
+     * Método para eliminar un cliente
+     * 
+     * @param id_cliente
+     * @return
+     */
+    public Mono<Void> eliminarCliente(Integer id_cliente) {
+        return webClient.delete()
+                .uri("/cliente/{id}", id_cliente)
+                .retrieve()
+                .bodyToMono(Void.class);
     }
 }
