@@ -41,13 +41,13 @@ public class CustomerController {
 
     /**
      * Método para mostrar la página de clientes
-     * 
+     *
      * @param model
      * @return
      */
     @GetMapping({ "/clientes", "" })
-    public Mono<String> mostrarPaginaClientes(Model model) {
-        // Obtener el usuario del modelo para comprobar si está logueado
+    public Mono<String> mostrarPaginaClientes(Model model, ServerWebExchange exchange) {
+        // Obtener el usuario de la sesión
         UserModel usuario = (UserModel) model.getAttribute("usuario");
         if (usuario != null) {
             // Obtener los clientes y añadirlos al modelo
@@ -67,7 +67,7 @@ public class CustomerController {
 
     /**
      * Método para mostrar la página del formulario de creación de un cliente
-     * 
+     *
      * @param model
      * @return
      */
@@ -79,15 +79,17 @@ public class CustomerController {
         // Añadir el cliente al modelo junto con la empresa y el tipo de cliente
         return Mono.zip(
                 companyService.obtenerEmpresas().collectList(),
-                customerTypeService.obtenerTiposCliente().collectList()).doOnNext(tuple -> {
+                customerTypeService.obtenerTiposCliente().collectList())
+                .doOnNext(tuple -> {
                     model.addAttribute("empresas", tuple.getT1());
                     model.addAttribute("tipos_cliente", tuple.getT2());
-                }).thenReturn("clientes/crear_cliente");
+                })
+                .thenReturn("clientes/crear_cliente");
     }
 
     /**
      * Método para guardar el cliente
-     * 
+     *
      * @param customerModel
      * @return
      */
@@ -95,24 +97,27 @@ public class CustomerController {
     public Mono<String> guardarCliente(
             @ModelAttribute("cliente") CustomerModel customerModel,
             ServerWebExchange exchange) {
+
+        // Guardar el cliente
         return customerService.guardarCliente(customerModel)
-                .flatMap(savedCustomer -> {
-                    // System.out.println("Cliente creado con Éxito! " + savedCustomer);
-                    return exchange.getSession().doOnNext(
-                            session -> session.getAttributes().put("successMessage", "Cliente creado con Éxito!"))
-                            .then(Mono.just("redirect:/clientes"));
-                })
-                .onErrorResume(error -> {
-                    // System.err.println("Error al guardar el cliente");
-                    return exchange.getSession().doOnNext(session -> session.getAttributes().put("errorMessage",
-                            "Error al guardar el cliente: " + error.getMessage()))
-                            .then(Mono.just("redirect:/clientes"));
-                });
+                .flatMap(savedCustomer -> exchange.getSession()
+                        .doOnNext(session -> {
+                            session.getAttributes().put("successMessage", "Cliente creado con Éxito!");
+                        })
+                        .then(Mono.just("redirect:/clientes/clientes")))
+
+                .onErrorResume(error -> exchange.getSession()
+                        .doOnNext(session -> {
+                            System.out.println("Error al guardar el cliente: " + error.getMessage());
+                            session.getAttributes().put("errorMessage", "Error al guardar el cliente");
+                        })
+                        .then(Mono.just("redirect:/clientes/clientes")));
+
     }
 
     /**
      * Método para mostrar la página de edición de un cliente
-     * 
+     *
      * @param id
      * @param model
      * @return
@@ -122,7 +127,8 @@ public class CustomerController {
         return Mono.zip(
                 customerService.obtenerCliente(id),
                 companyService.obtenerEmpresas().collectList(),
-                customerTypeService.obtenerTiposCliente().collectList()).doOnNext(tuple -> {
+                customerTypeService.obtenerTiposCliente().collectList())
+                .doOnNext(tuple -> {
                     model.addAttribute("cliente", tuple.getT1());
                     model.addAttribute("empresas", tuple.getT2());
                     model.addAttribute("tipos_cliente", tuple.getT3());
@@ -130,8 +136,8 @@ public class CustomerController {
     }
 
     /**
-     * Método para mostrar la página de edición de un cliente
-     * 
+     * Método para editar un cliente
+     *
      * @param id
      * @param customerModel
      * @param serverWebExchange
@@ -145,7 +151,6 @@ public class CustomerController {
 
         return customerService.obtenerCliente(id)
                 .flatMap(existingCustomer -> {
-                    // Actualizar los datos del cliente obteniendolos del modelo
                     existingCustomer.setNombre(customerModel.getNombre());
                     existingCustomer.setApellido(customerModel.getApellido());
                     existingCustomer.setCorreo(customerModel.getCorreo());
@@ -154,21 +159,32 @@ public class CustomerController {
                     existingCustomer.setEmpresa(customerModel.getEmpresa());
                     existingCustomer.setTipo_cliente(customerModel.getTipo_cliente());
 
-                    // Actualizar el cliente
+                    // Guardar el cliente actualizado
                     return customerService.guardarCliente(existingCustomer);
                 })
-                .flatMap(updatedCustomer -> {
-                    // System.out.println("Cliente Editado con Éxito!");
-                    return serverWebExchange.getSession().doOnNext(
-                            session -> session.getAttributes().put("successMessage", "Cliente Editado con Éxito!"))
-                            .then(Mono.just("redirect:/clientes"));
-                })
-                .onErrorResume(error -> {
-                    // System.err.println("Error al Editar: " + error.getMessage());
-                    return serverWebExchange.getSession()
-                            .doOnNext(session -> session.getAttributes().put("errorMessage",
-                                    "Error al Editar"))
-                            .then(Mono.just("redirect:/clientes"));
-                });
+                .flatMap(updatedCustomer -> serverWebExchange.getSession()
+                        .doOnNext(session -> session.getAttributes()
+                                .put("successMessage", "Cliente Editado con Éxito!"))
+                        .then(Mono.just("redirect:/clientes/clientes")))
+
+                .onErrorResume(error -> serverWebExchange.getSession()
+                        .doOnNext(session -> session.getAttributes()
+                                .put("errorMessage", "Error al editar el cliente: " + error.getMessage()))
+                        .then(Mono.just("redirect:/clientes/clientes")));
     }
+
+    /**
+     * Método para eliminar un cliente
+     *
+     * @param id
+     * @return
+     */
+    @GetMapping("/clientes/{id}")
+    public Mono<String> eliminarCliente(@PathVariable Integer id) {
+        return customerService.eliminarCliente(id)
+                .doOnError(error -> System.err.println("Error al Eliminar: " + error.getMessage()))
+                .doOnSuccess(aVoid -> System.out.println("Cliente Eliminado con Éxito!"))
+                .then(Mono.just("redirect:/clientes/clientes"));
+    }
+
 }
