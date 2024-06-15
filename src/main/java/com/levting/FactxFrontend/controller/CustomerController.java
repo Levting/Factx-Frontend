@@ -23,6 +23,9 @@ import reactor.core.publisher.Mono;
 @RequestMapping("/clientes")
 public class CustomerController {
 
+    // Este controlador se encarga de manejar las peticiones relacionadas con los
+    // clientes y los tipos de cliente
+
     // Inyeccion de los servicios
     private final CustomerService customerService;
     private final CompanyService companyService;
@@ -46,7 +49,7 @@ public class CustomerController {
      * @param model
      * @return
      */
-    @GetMapping({ "/clientes", "" })
+    @GetMapping({"/clientes", ""})
     public Mono<String> mostrarPaginaClientes(Model model, ServerWebExchange exchange) {
         // Obtener el usuario de la sesión
         UserModel usuario = (UserModel) model.getAttribute("usuario");
@@ -89,8 +92,8 @@ public class CustomerController {
 
         // Añadir el cliente al modelo junto con la empresa y el tipo de cliente
         return Mono.zip(
-                companyService.obtenerEmpresas().collectList(),
-                customerTypeService.obtenerTiposCliente().collectList())
+                        companyService.obtenerEmpresas().collectList(),
+                        customerTypeService.obtenerTiposCliente().collectList())
                 .doOnNext(tuple -> {
                     model.addAttribute("empresas", tuple.getT1());
                     model.addAttribute("tipos_cliente", tuple.getT2());
@@ -136,9 +139,9 @@ public class CustomerController {
     @GetMapping("/clientes/editar/{id}")
     public Mono<String> mostrarFormularioEditarCliente(@PathVariable Integer id, Model model) {
         return Mono.zip(
-                customerService.obtenerCliente(id),
-                companyService.obtenerEmpresas().collectList(),
-                customerTypeService.obtenerTiposCliente().collectList())
+                        customerService.obtenerCliente(id),
+                        companyService.obtenerEmpresas().collectList(),
+                        customerTypeService.obtenerTiposCliente().collectList())
                 .doOnNext(tuple -> {
                     model.addAttribute("cliente", tuple.getT1());
                     model.addAttribute("empresas", tuple.getT2());
@@ -191,11 +194,17 @@ public class CustomerController {
      * @return
      */
     @GetMapping("/clientes/{id}")
-    public Mono<String> eliminarCliente(@PathVariable Integer id) {
+    public Mono<String> eliminarCliente(@PathVariable Integer id, ServerWebExchange exchange) {
         return customerService.eliminarCliente(id)
-                .doOnError(error -> System.err.println("Error al Eliminar: " + error.getMessage()))
-                .doOnSuccess(aVoid -> System.out.println("Cliente Eliminado con Éxito!"))
-                .then(Mono.just("redirect:/clientes/clientes"));
+                .doOnSuccess(success -> exchange.getSession()
+                        .doOnNext(session -> session.getAttributes()
+                                .put("successMessage", "Cliente Eliminado con Éxito!"))
+                        .subscribe())
+                .doOnError(error -> exchange.getSession()
+                        .doOnNext(session -> session.getAttributes()
+                                .put("errorMessage", "Error al Eliminar el Cliente: " + error.getMessage()))
+                        .subscribe())
+                .thenReturn("redirect:/clientes/clientes");
     }
 
     // -------------------- TIPOS DE CLIENTE --------------------
