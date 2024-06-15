@@ -7,6 +7,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import com.levting.FactxFrontend.model.CustomerTypeModel;
 
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Service
 public class CustomerTypeService {
@@ -33,43 +34,43 @@ public class CustomerTypeService {
     /**
      * Método para obtener un tipo de cliente
      */
-    public Flux<CustomerTypeModel> obtenerTipoCliente(Integer id_tipo_cliente) {
+    public Mono<CustomerTypeModel> obtenerTipoCliente(Integer id_tipo_cliente) {
         return webClient.get()
                 .uri("/tipoCliente/{id}", id_tipo_cliente)
                 .retrieve()
-                .bodyToFlux(CustomerTypeModel.class);
+                .bodyToMono(CustomerTypeModel.class);
     }
 
     /**
      * Método para guardar un tipo de cliente
      */
-    public Flux<CustomerTypeModel> guardarTipoCliente(CustomerTypeModel customerTypeModel) {
+    public Mono<CustomerTypeModel> guardarTipoCliente(CustomerTypeModel customerTypeModel) {
         return webClient.post()
                 .uri("/tipoCliente")
                 .bodyValue(customerTypeModel)
                 .retrieve()
-                .bodyToFlux(CustomerTypeModel.class);
+                .bodyToMono(CustomerTypeModel.class);
     }
 
     /**
      * Método para actualizar un tipo de cliente
      */
-    public Flux<CustomerTypeModel> actualizarTipoCliente(CustomerTypeModel customerTypeModel) {
+    public Mono<CustomerTypeModel> actualizarTipoCliente(CustomerTypeModel customerTypeModel) {
         return webClient.post()
                 .uri("/tipoCliente")
                 .bodyValue(customerTypeModel)
                 .retrieve()
-                .bodyToFlux(CustomerTypeModel.class);
+                .bodyToMono(CustomerTypeModel.class);
     }
 
     /**
      * Método para eliminar un tipo de cliente
      */
-    public Flux<Void> eliminarTipoCliente(Integer id_tipo_cliente) {
+    public Mono<Void> eliminarTipoCliente(Integer id_tipo_cliente) {
         return webClient.delete()
                 .uri("/tipoCliente/{id}", id_tipo_cliente)
                 .retrieve()
-                .bodyToFlux(Void.class);
+                .bodyToMono(Void.class);
     }
 
 }

@@ -3,6 +3,7 @@ package com.levting.FactxFrontend.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.server.ServerWebExchange;
 
 import com.levting.FactxFrontend.model.CustomerModel;
+import com.levting.FactxFrontend.model.CustomerTypeModel;
 import com.levting.FactxFrontend.model.UserModel;
 import com.levting.FactxFrontend.service.CompanyService;
 import com.levting.FactxFrontend.service.CustomerService;
@@ -51,15 +53,25 @@ public class CustomerController {
         UserModel usuario = (UserModel) model.getAttribute("usuario");
         if (usuario != null) {
             // Obtener los clientes y añadirlos al modelo
-            return customerService.obtenerClientes()
-                    .collectList()
-                    .doOnNext(clientes -> {
-                        if (clientes.isEmpty()) {
-                            System.out.println("No existen Clientes!");
-                        } else {
-                            model.addAttribute("clientes", clientes);
-                        }
-                    }).thenReturn("clientes/clientes");
+            return exchange.getSession()
+                    .doOnNext(session -> {
+                        // Añadir los mensajes de éxito o error al modelo
+                        model.addAttribute("successMessage", session.getAttribute("successMessage"));
+                        model.addAttribute("errorMessage", session.getAttribute("errorMessage"));
+
+                        // Eliminar los mensajes de éxito o error de la sesión
+                        session.getAttributes().remove("successMessage");
+                        session.getAttributes().remove("errorMessage");
+                    })
+                    .then(customerService.obtenerClientes()
+                            .collectList()
+                            .doOnNext(clientes -> {
+                                if (clientes.isEmpty()) {
+                                    System.out.println("No existen Clientes!");
+                                } else {
+                                    model.addAttribute("clientes", clientes);
+                                }
+                            }).thenReturn("clientes/clientes"));
         } else {
             return Mono.just("redirect:/inicio_sesion");
         }
@@ -179,12 +191,149 @@ public class CustomerController {
      * @param id
      * @return
      */
-    @GetMapping("/clientes/{id}")
-    public Mono<String> eliminarCliente(@PathVariable Integer id) {
+    @DeleteMapping("/eliminar/{id}")
+    public Mono<String> eliminarCliente(@PathVariable Integer id, ServerWebExchange exchange) {
         return customerService.eliminarCliente(id)
+                .then(exchange.getSession()
+                        .doOnNext(session -> session.getAttributes().put("successMessage",
+                                "Cliente eliminado con éxito."))
+                        .then(Mono.just("redirect:/clientes/clientes")))
+
+                .onErrorResume(error -> exchange.getSession()
+                        .doOnNext(session -> session.getAttributes().put("errorMessage",
+                                "Error al eliminar cliente: " + error.getMessage()))
+                        .then(Mono.just("redirect:/clientes/clientes")));
+    }
+
+    // TIPOS DE CLIENTE
+
+    /**
+     * Método para mostrar la página de tipos de cliente
+     *
+     * @param model
+     * @return
+     */
+    @GetMapping("/tipos_cliente")
+    public Mono<String> mostrarPaginaTiposCliente(Model model) {
+        // Obtener el usuario de la sesión
+        UserModel usuario = (UserModel) model.getAttribute("usuario");
+        if (usuario != null) {
+            // Obtener los clientes y añadirlos al modelo
+            return customerTypeService.obtenerTiposCliente()
+                    .collectList()
+                    .doOnNext(tipos_cliente -> {
+                        if (tipos_cliente.isEmpty()) {
+                            System.out.println("No existen Clientes!");
+                        } else {
+                            model.addAttribute("tipos_cliente", tipos_cliente);
+                        }
+                    }).thenReturn("clientes/tipos_cliente");
+        } else {
+            return Mono.just("redirect:/inicio_sesion");
+        }
+    }
+
+    /**
+     * Método para mostrar la página del formulario de creación de un tipo de
+     * cliente
+     *
+     * @param model
+     * @return
+     */
+    @GetMapping("/tipos_cliente/crear")
+    public Mono<String> mostrarFormularioCrearTipoCliente(Model model) {
+        // Añadir un nuevo objeto Cliente al modelo
+        model.addAttribute("tipo_cliente", new CustomerTypeModel());
+
+        // Añadir el tipo de cliente al modelo
+        return Mono.just("clientes/crear_tipo_cliente");
+    }
+
+    /**
+     * Método para guardar un tipo de cliente
+     *
+     * @param customerTypeModel
+     * @return
+     */
+    @PostMapping("/tipos_cliente")
+    public Mono<String> guardarTipoCliente(
+            @ModelAttribute("tipo_cliente") CustomerTypeModel customerTypeModel,
+            ServerWebExchange exchange) {
+
+        // Guardar el tipo de cliente
+        return customerTypeService.guardarTipoCliente(customerTypeModel)
+                .flatMap(savedCustomerType -> exchange.getSession()
+                        .doOnNext(session -> {
+                            session.getAttributes().put("successMessage", "Tipo de Cliente creado con Éxito!");
+                        })
+                        .then(Mono.just("redirect:/clientes/tipos_cliente")))
+
+                .onErrorResume(error -> exchange.getSession()
+                        .doOnNext(session -> {
+                            System.out.println("Error al guardar el tipo de cliente: " + error.getMessage());
+                            session.getAttributes().put("errorMessage", "Error al guardar el tipo de cliente");
+                        })
+                        .then(Mono.just("redirect:/clientes/tipos_cliente")));
+    }
+
+    /**
+     * Método para mostrar la página de edición de un tipo de cliente
+     *
+     * @param id
+     * @param model
+     * @return
+     */
+    @GetMapping("/tipos_cliente/editar/{id}")
+    public Mono<String> mostrarFormularioEditarTipoCliente(@PathVariable Integer id, Model model) {
+        return customerTypeService.obtenerTipoCliente(id)
+                .doOnNext(tipo_cliente -> model.addAttribute("tipo_cliente", tipo_cliente))
+                .thenReturn("clientes/editar_tipo_cliente");
+    }
+
+    /**
+     * Método para editar un tipo de cliente
+     *
+     * @param id
+     * @param customerTypeModel
+     * @param serverWebExchange
+     * @return
+     */
+    @PostMapping("/tipos_cliente/{id}")
+    public Mono<String> editarTipoCliente(
+            @PathVariable Integer id,
+            @ModelAttribute("tipo_cliente") CustomerTypeModel customerTypeModel,
+            ServerWebExchange serverWebExchange) {
+
+        return customerTypeService.obtenerTipoCliente(id)
+                .flatMap(existingCustomerType -> {
+                    existingCustomerType.setTipo((customerTypeModel.getTipo()));
+
+                    // Guardar el tipo de cliente actualizado
+                    return customerTypeService.guardarTipoCliente(existingCustomerType);
+                })
+                .flatMap(updatedCustomerType -> serverWebExchange.getSession()
+                        .doOnNext(session -> session.getAttributes()
+                                .put("successMessage", "Tipo de Cliente Editado con Éxito!"))
+                        .then(Mono.just("redirect:/clientes/tipos_cliente")))
+
+                .onErrorResume(error -> serverWebExchange.getSession()
+                        .doOnNext(session -> session.getAttributes()
+                                .put("errorMessage", "Error al editar el tipo de cliente: " + error.getMessage()))
+                        .then(Mono.just("redirect:/clientes/tipos_cliente")));
+    }
+
+    /**
+     * Método para eliminar un tipo de cliente
+     *
+     * @param id
+     * @return
+     */
+    @GetMapping("/tipos_cliente/{id}")
+    public Mono<String> eliminarTipoCliente(@PathVariable Integer id) {
+        return customerTypeService.eliminarTipoCliente(id)
                 .doOnError(error -> System.err.println("Error al Eliminar: " + error.getMessage()))
-                .doOnSuccess(aVoid -> System.out.println("Cliente Eliminado con Éxito!"))
-                .then(Mono.just("redirect:/clientes/clientes"));
+                .doOnSuccess(aVoid -> System.out.println("Tipo de Cliente Eliminado con Éxito!"))
+                .then(Mono.just("redirect:/clientes/tipos_cliente"));
     }
 
 }
