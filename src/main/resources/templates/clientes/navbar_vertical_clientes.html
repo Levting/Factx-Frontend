@@ -15,14 +15,10 @@
 <body>
 
 <div th:fragment="navbar_vertical">
-    <ul class="list-unstyled">
-        <li class="nav-item mb-2">
-            <a class="nav-link" th:href="@{/clientes/clientes}">Clientes</a>
-        </li>
-        <li class="nav-item mb-2">
-            <a class="nav-link" th:href="@{/clientes/tipos_cliente}">Tipos de Clientes</a>
-        </li>
-    </ul>
+    <nav class="nav flex-column bg-light">
+        <a class="nav-link active" aria-current="page" th:href="@{/clientes/clientes}">Clientes</a>
+        <a class="nav-link" th:href="@{/clientes/tipos_cliente}">Tipos Cliente</a>
+    </nav>
 </div>
 </body>
 </html>

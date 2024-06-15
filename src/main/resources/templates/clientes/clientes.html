@@ -67,39 +67,12 @@
                                     <a th:href="@{/clientes/clientes/editar/{id}(id=${cliente.id_cliente})}"
                                         class="btn btn-info btn-sm">Editar</a>
 
-                                    <!-- Botón de eliminar con data-cliente-id -->
-                                    <a href="#" th:attr="data-id=${cliente.id_cliente}" class="btn btn-danger btn-sm"
-                                        data-bs-toggle="modal" data-bs-target="#deleteModal">Eliminar</a>
-
+                                    <a th:href="@{/clientes/clientes/{id}(id=${cliente.id_cliente})}"
+                                        class="btn btn-danger btn-sm">Eliminar</a>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal de confirmación -->
-    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="deleteModalLabel">Confirmar eliminación</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <!-- Mostrar el nombre del cliente -->
-                    <p>¿Estás seguro de que quieres eliminar al cliente <span id="clienteNombre"></span>?</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <!-- Formulario para enviar solicitud DELETE -->
-                    <form id="deleteForm" th:action="@{/clientes/eliminar/{id}(id=${clienteId})}" th:method="post">
-                        <input type="hidden" name="_method" value="DELETE">
-                        <input type="hidden" name="id" th:value="${clienteId}">
-                        <button type="submit" class="btn btn-danger">Eliminar</button>
-                    </form>
                 </div>
             </div>
         </div>
@@ -116,15 +89,6 @@
                 $('#errorMessage').fadeOut('slow');
                 $('#successMessage').fadeOut('slow');
             }, 3000); // 3 segundos
-
-            // Actualizar el formulario de eliminación en el modal
-            $('#deleteModal').on('show.bs.modal', function (event) {
-                var button = $(event.relatedTarget); // Botón que activó el modal
-                var clienteId = button.data('cliente-id'); // Extraer información del atributo data-cliente-id
-
-                // Asignar el ID del cliente al input hidden del formulario de eliminación
-                $('#clienteId').val(clienteId);
-            });
         });
     </script>
 </body>

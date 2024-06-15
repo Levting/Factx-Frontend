@@ -3,7 +3,6 @@ package com.levting.FactxFrontend.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -191,21 +190,15 @@ public class CustomerController {
      * @param id
      * @return
      */
-    @DeleteMapping("/eliminar/{id}")
-    public Mono<String> eliminarCliente(@PathVariable Integer id, ServerWebExchange exchange) {
+    @GetMapping("/clientes/{id}")
+    public Mono<String> eliminarCliente(@PathVariable Integer id) {
         return customerService.eliminarCliente(id)
-                .then(exchange.getSession()
-                        .doOnNext(session -> session.getAttributes().put("successMessage",
-                                "Cliente eliminado con éxito."))
-                        .then(Mono.just("redirect:/clientes/clientes")))
-
-                .onErrorResume(error -> exchange.getSession()
-                        .doOnNext(session -> session.getAttributes().put("errorMessage",
-                                "Error al eliminar cliente: " + error.getMessage()))
-                        .then(Mono.just("redirect:/clientes/clientes")));
+                .doOnError(error -> System.err.println("Error al Eliminar: " + error.getMessage()))
+                .doOnSuccess(aVoid -> System.out.println("Cliente Eliminado con Éxito!"))
+                .then(Mono.just("redirect:/clientes/clientes"));
     }
 
-    // TIPOS DE CLIENTE
+    // -------------------- TIPOS DE CLIENTE --------------------
 
     /**
      * Método para mostrar la página de tipos de cliente
@@ -214,20 +207,30 @@ public class CustomerController {
      * @return
      */
     @GetMapping("/tipos_cliente")
-    public Mono<String> mostrarPaginaTiposCliente(Model model) {
+    public Mono<String> mostrarPaginaTiposCliente(Model model, ServerWebExchange serverWebExchange) {
         // Obtener el usuario de la sesión
         UserModel usuario = (UserModel) model.getAttribute("usuario");
         if (usuario != null) {
             // Obtener los clientes y añadirlos al modelo
-            return customerTypeService.obtenerTiposCliente()
-                    .collectList()
-                    .doOnNext(tipos_cliente -> {
-                        if (tipos_cliente.isEmpty()) {
-                            System.out.println("No existen Clientes!");
-                        } else {
-                            model.addAttribute("tipos_cliente", tipos_cliente);
-                        }
-                    }).thenReturn("clientes/tipos_cliente");
+            return serverWebExchange.getSession()
+                    .doOnNext(session -> {
+                        // Añadir los mensajes de éxito o error al modelo
+                        model.addAttribute("successMessage", session.getAttribute("successMessage"));
+                        model.addAttribute("errorMessage", session.getAttribute("errorMessage"));
+
+                        // Eliminar los mensajes de éxito o error de la sesión
+                        session.getAttributes().remove("successMessage");
+                        session.getAttributes().remove("errorMessage");
+                    })
+                    .then(customerTypeService.obtenerTiposCliente()
+                            .collectList()
+                            .doOnNext(tipos_cliente -> {
+                                if (tipos_cliente.isEmpty()) {
+                                    System.out.println("No existen Clientes!");
+                                } else {
+                                    model.addAttribute("tipos_cliente", tipos_cliente);
+                                }
+                            }).thenReturn("clientes/tipos_cliente"));
         } else {
             return Mono.just("redirect:/inicio_sesion");
         }
