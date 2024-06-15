@@ -1,6 +1,7 @@
 package com.levting.FactxFrontend.controller;
 
 import com.levting.FactxFrontend.model.CategoryModel;
+import com.levting.FactxFrontend.model.IVAModel;
 import com.levting.FactxFrontend.model.ProductModel;
 import com.levting.FactxFrontend.model.UserModel;
 import com.levting.FactxFrontend.service.CategoryService;
@@ -399,6 +400,65 @@ public class InventoryController {
 
     }
 
+    // -------------------- IVA --------------------
 
+    /**
+     * Método para mostrar la vista de los ivas
+     * 
+     * @param model
+     * @param exchange
+     * @return
+     */
+    @GetMapping("/ivas")
+    public Mono<String> mostrarVistaIva(Model model, ServerWebExchange exchange) {
 
+        UserModel usuario = (UserModel) model.getAttribute("usuario");
+
+        // Si el usuario se encuentra en la sesion se le permite acceder a la vista, si
+        // no se le redirige al login
+        if (usuario != null) {
+            return exchange.getSession()
+                    .flatMap(session -> {
+                        // Añadir los mensajes de éxito o error al modelo
+                        model.addAttribute("successMessage", session.getAttribute("successMessage"));
+                        model.addAttribute("errorMessage", session.getAttribute("errorMessage"));
+
+                        // Limpiar los mensajes de la sesión
+                        session.getAttributes().remove("successMessage");
+                        session.getAttributes().remove("errorMessage");
+
+                        // Obtener los productos y añadirlos al modelo
+                        return ivaService.obtenerIVAs().collectList();
+                    })
+                    .doOnNext(ivas -> {
+                        if (ivas.isEmpty()) {
+                            System.out.println("No hay Productos!");
+                        }
+                        model.addAttribute("ivas", ivas);
+                    })
+                    .thenReturn("inventario/ivas");
+        } else {
+            return Mono.just("redirect:/inicio_sesion");
+        }
+    }
+
+    /**
+     * Método para mostrar el formulario de creación de ivas
+     * 
+     * @param model
+     * @return
+     */
+    @GetMapping("/ivas/crear")
+    public Mono<String> mostrarFormularioCrearIvas(Model model) {
+        // Añadir un nuevo iva al modelo
+        model.addAttribute("iva", new IVAModel());
+
+        // Obtener las categorias y añadirlas al modelo
+        return ivaService.obtenerIVAs()
+                .collectList()
+                .map(ivas -> {
+                    model.addAttribute("ivas", ivas);
+                    return "inventario/crear_iva";
+                });
+    }
 }
