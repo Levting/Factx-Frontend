@@ -39,4 +39,27 @@ public class CompanyService {
                     return Mono.empty();
                 });
     }
+
+    public Mono<CompanyModel> guardarEmpresa(CompanyModel companyModel) {
+        return webClient.post()
+                .uri("/empresa")
+                .bodyValue(companyModel)
+                .retrieve()
+                .bodyToMono(CompanyModel.class)
+                .onErrorResume(WebClientResponseException.class, ex -> {
+                    System.err.println("Error al guardar la empresa: " + ex.getMessage());
+                    return Mono.empty();
+                });
+    }
+
+    public Mono<Void> eliminarEmpresa(Integer id_empresa) {
+        return webClient.delete()
+                .uri("/empresa/{id}", id_empresa)
+                .retrieve()
+                .bodyToMono(Void.class)
+                .onErrorResume(WebClientResponseException.class, ex -> {
+                    System.err.println("Error al eliminar la empresa: " + ex.getMessage());
+                    return Mono.empty();
+                });
+    }
 }

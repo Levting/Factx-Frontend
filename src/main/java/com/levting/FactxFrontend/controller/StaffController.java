@@ -156,16 +156,5 @@ public class StaffController {
         return Mono.just("personal/editar_rol");
     }
 
-    /**
-     * Controlador de Empresa
-     */
-
-    @GetMapping("/empresas")
-    public Mono<String> mostrarEmpresas(Model model) {
-        return companyService.obtenerEmpresas()
-                .collectList()
-                .doOnNext(empresas -> model.addAttribute("empresas", empresas))
-                .thenReturn("personal/empresas");
-    }
 
 }

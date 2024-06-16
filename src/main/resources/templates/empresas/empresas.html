@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Lista de Usuarios</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+</head>
+
+<body>
+
+    <div th:insert="~{administradores/navbar_administradores :: navbar}"></div>
+
+    <div class="container mt-4">
+        <!--Menú Vertical-->
+        <div class="row mb-4 align-items-center">
+            <div class="md-9 d-flex justify-content-between align-items-center">
+                <h1 class="mb-0">Empresas</h1>
+                <a th:href="@{/empresas/empresas/crear}" class="btn btn-outline-secondary ms-auto">Nueva Empresa</a>
+            </div>
+        </div>
+
+        <div class="row">
+
+            <div class="col">
+                <form class="d-flex mb-3" role="search">
+                    <input class="form-control me-2" type="search" placeholder="Buscar por Nombre" aria-label="Buscar">
+                    <button class="btn btn-outline-success" type="submit">Buscar</button>
+                </form>
+
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>RUC</th>
+                                <th>Nombre Compercial</th>
+                                <th>Dirección</th>
+                                <th>Teléfono</th>
+                                <th>Fase</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="empresa : ${empresas}">
+                                <td th:text="${empresa.ruc}">[RUC]</td>
+                                <td th:text="${empresa.nombre_comercial}">[Nomnre Comercial]</td>
+                                <td th:text="${empresa.direccion}">[Direccion]</td>
+                                <td th:text="${empresa.telefono}">[Telefono]</td>
+                                <td th:text="${empresa.desarrollo ? 'Desarrollo' : 'Producción'}">[Fase]</td>
+                                <td>
+                                    <a th:href="@{/empresas/empresas/editar/{id}(id=${empresa.id_empresa})}"
+                                        class="btn btn-info btn-sm">Editar</a>
+                                    <a th:href="@{/empresas/empresas/{id}(id=${empresa.id_empresa})}"
+                                        class="btn btn-danger btn-sm">Eliminar</a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>
