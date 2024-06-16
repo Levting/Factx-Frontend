@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Categorias</title>
+    <title>IVAs</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 </head>
@@ -22,9 +22,8 @@
                  class="img-fluid mb-1" width="200" height="200">-->
             </div>
             <div class="col-md-9 d-flex justify-content-between align-items-center">
-                <h1 class="mb-0">Categorías</h1>
-                <a th:href="@{/inventario/categorias/crear}" class="btn btn-outline-secondary ms-auto">Nueva
-                    Categoría</a>
+                <h1 class="mb-0">IVAs</h1>
+                <a th:href="@{/inventario/ivas/crear}" class="btn btn-outline-secondary ms-auto">Nuevo IVA</a>
             </div>
         </div>
 
@@ -53,19 +52,19 @@
                         <thead>
                             <tr>
                                 <th>ID</th>
-                                <th>Categoría</th>
-                                <th>IVA</th>
+                                <th>Nombre</th>
+                                <th>Valor Agregado</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr th:each="categoria : ${categorias}">
-                                <td th:text="${categoria.id_categoria}">ID</td>
-                                <td th:text="${categoria.categoria}">[Categoría]</td>
-                                <td th:text="${categoria.iva.iva}">[IVA]</td>
+                            <tr th:each="iva : ${ivas}">
+                                <td th:text="${iva.id_iva}">[ID]</td>
+                                <td th:text="${iva.iva_nombre}">[Nombre]</td>
+                                <td th:text="${iva.iva}">[IVA]</td>
                                 <td>
-                                    <a th:href="@{/inventario/categorias/editar/{id}(id=${categoria.id_categoria})}"
+                                    <a th:href="@{/inventario/ivas/editar/{id}(id=${iva.id_iva})}"
                                         class="btn btn-info btn-sm">Editar</a>
-                                    <a th:href="@{/inventario/categorias/{id}(id=${categoria.id_categoria})}"
+                                    <a th:href="@{/inventario/ivas/{id}(id=${iva.id_iva})}"
                                         class="btn btn-danger btn-sm">Eliminar</a>
                                 </td>
                             </tr>
