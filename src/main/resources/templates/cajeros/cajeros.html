@@ -36,7 +36,6 @@
                 <h1 th:text="${session.usuario.empresa.razon_social}">[Nombre de la Empresa]</h1>
                 <p>
                     Bienvenido,
-                    <!--<span th:text="${usuario.nombre} + ' ' + ${usuario.apellido}">[Nombre del Administrador]</span>-->
                     <span th:text="${session.usuario.nombre} + ' ' + ${session.usuario.apellido}">[Nombre del
                         Administrador]</span>
 
@@ -44,28 +43,27 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-md-4 text-center">
+            <div class="col-md-4 text-center p-4">
                 <!-- Foto del usuario -->
                 <img src="https://cdn-icons-png.flaticon.com/512/456/456212.png" alt="Imagen de Usuario"
-                    class="img-fluid rounded-circle mb-3" width="100" height="100">
+                    class="img-fluid rounded-circle mb-3 border" width="120" height="120">
                 <ul class="list-unstyled">
-                    <li class="text-center mb-2">
-                        <!--<span th:text="${usuario.nombre}">[Nombre del Usuario]</span>-->
-                        <span th:text="${session.usuario.nombre}">[Nombre del Usuario]</span>
-
+                    <li class="mb-2">
+                        <h5 class="font-weight-bold text-secondary mb-1">Nombre Completo:</h5>
+                        <h4 class="text-primary"
+                            th:text="${session.usuario.nombre} + ' ' + ${session.usuario.apellido}">[Nombre del Usuario]
+                        </h4>
                     </li>
-                    <li class="text-center mb-2">
-                        <!--<span th:text="${usuario.apellido}">[Apellido del Usuario]</span>-->
-                        <span th:text="${session.usuario.apellido}">[Apellido del Usuario]</span>
-                    </li>
-                    <li class="text-center mb-2">
-                        <!--<span th:text="${usuario.usuario}">[Usuario del Usuario]</span>-->
-                        <span th:text="${session.usuario.usuario}">[Usuario del Usuario]</span>
-
+                    <li class="mb-2">
+                        <h5 class="font-weight-bold text-secondary mb-1">Usuario:</h5>
+                        <h6 class="text-primary" th:text="${session.usuario.usuario}">[Usuario del Usuario]</h6>
                     </li>
                 </ul>
-                <button class="btn btn-primary mt-3">Editar</button>
+                <!-- <button class="btn btn-primary mt-3">Editar</button> -->
             </div>
+
+
+
 
             <div class="col-md-8">
                 <!-- Botones de Facturación y Listar Usuarios -->
@@ -73,7 +71,7 @@
                     <div class="col-md-6">
                         <a th:href="@{/facturacion}" class="btn btn-lg btn-secondary w-100 py-4">Facturación</a>
                     </div>
-                    
+
                     <div class="col-md-6">
                         <a th:href="@{/cerrar_sesion}" class="btn btn-lg btn-secondary w-100 py-4">Cerrar Sesión</a>
                     </div>

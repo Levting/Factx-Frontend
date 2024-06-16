@@ -19,7 +19,8 @@
         <div class="row mb-4 align-items-center">
             <div class="md-9 d-flex justify-content-between align-items-center">
                 <h1 class="mb-0">Empresas</h1>
-                <a th:href="@{/empresas/empresas/crear}" class="btn btn-outline-secondary ms-auto">Nueva Empresa</a>
+                <!-- <a th:href="@{/empresas/empresas/crear}" class="btn btn-outline-secondary ms-auto">Nueva Empresa</a> -->
+                <a href="#" class="btn btn-outline-secondary ms-auto">Nueva Empresa</a>
             </div>
         </div>
 
@@ -50,10 +51,16 @@
                                 <td th:text="${empresa.telefono}">[Telefono]</td>
                                 <td th:text="${empresa.desarrollo ? 'Desarrollo' : 'Producción'}">[Fase]</td>
                                 <td>
-                                    <a th:href="@{/empresas/empresas/editar/{id}(id=${empresa.id_empresa})}"
+                                    <!-- <a th:href="@{/empresas/empresas/editar/{id}(id=${empresa.id_empresa})}"
                                         class="btn btn-info btn-sm">Editar</a>
+
                                     <a th:href="@{/empresas/empresas/{id}(id=${empresa.id_empresa})}"
-                                        class="btn btn-danger btn-sm">Eliminar</a>
+                                        class="btn btn-danger btn-sm">Eliminar</a> -->
+
+                                    <a href="#" class="btn btn-info btn-sm">Editar</a>
+
+                                    <a href="#" class="btn btn-danger btn-sm">Eliminar</a>
+
                                 </td>
                             </tr>
                         </tbody>
