@@ -15,7 +15,12 @@
 
 <body>
 
-    <div th:insert="~{administradores/navbar_administradores :: navbar}"></div>
+    <div th:if="${usuario.rol.id_rol == 1}">
+        <div th:insert="~{administradores/navbar_administradores :: navbar}"></div>
+    </div>
+    <div th:if="${usuario.rol.id_rol == 2}">
+        <div th:insert="~{cajeros/navbar_cajeros :: navbar}"></div>
+    </div>
 
     <div class="container mt-4">
         <h2 class="mb-4 text-center">Nueva Factura</h2>
