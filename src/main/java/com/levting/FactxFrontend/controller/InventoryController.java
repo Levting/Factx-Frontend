@@ -53,7 +53,7 @@ public class InventoryController {
      * @param exchange
      * @return
      */
-    @GetMapping({ "/productos", "" })
+    @GetMapping({"/productos", ""})
     public Mono<String> mostrarVistaInventario(Model model, ServerWebExchange exchange) {
 
         UserModel usuario = (UserModel) model.getAttribute("usuario");
@@ -168,9 +168,9 @@ public class InventoryController {
         return Mono.zip(
                 productService.obtenerProducto(id),
                 categoryService.obtenerCategorias().collectList()).doOnNext(tuple -> {
-                    model.addAttribute("producto", tuple.getT1());
-                    model.addAttribute("categorias", tuple.getT2());
-                }).thenReturn("inventario/editar_producto");
+            model.addAttribute("producto", tuple.getT1());
+            model.addAttribute("categorias", tuple.getT2());
+        }).thenReturn("inventario/editar_producto");
     }
 
     /**
@@ -283,7 +283,7 @@ public class InventoryController {
 
     /**
      * Método para mostrar el formulario de creación de categorias
-     * 
+     *
      * @param model
      * @return
      */
@@ -296,21 +296,21 @@ public class InventoryController {
         return Mono.zip(
                 ivaService.obtenerIVAs().collectList(),
                 companyService.obtenerEmpresas().collectList()).doOnNext(tuple -> {
-                    model.addAttribute("ivas", tuple.getT1());
-                    model.addAttribute("empresas", tuple.getT2());
-                }).thenReturn("inventario/crear_categoria");
+            model.addAttribute("ivas", tuple.getT1());
+            model.addAttribute("empresas", tuple.getT2());
+        }).thenReturn("inventario/crear_categoria");
     }
 
     /**
      * Método para guardar una categoria
-     * 
+     *
      * @param categoryModel
      * @param exchange
      * @return
      */
     @PostMapping("/categorias")
     public Mono<String> guardarCategoria(@ModelAttribute("categoria") CategoryModel categoryModel,
-            ServerWebExchange exchange) {
+                                         ServerWebExchange exchange) {
         return categoryService.guardarCategoria(categoryModel)
                 .doOnSuccess(success -> exchange.getSession()
                         .doOnNext(session -> session.getAttributes()
@@ -326,7 +326,7 @@ public class InventoryController {
 
     /**
      * Método para mostrar el formulario de edición de categorias
-     * 
+     *
      * @param id
      * @param model
      * @return
@@ -337,16 +337,16 @@ public class InventoryController {
                 categoryService.obtenerCategoria(id),
                 ivaService.obtenerIVAs().collectList(),
                 companyService.obtenerEmpresas().collectList()).doOnNext(tuple -> {
-                    model.addAttribute("categoria", tuple.getT1());
-                    model.addAttribute("ivas", tuple.getT2());
-                    model.addAttribute("empresas", tuple.getT3());
-                }).thenReturn("inventario/editar_categoria");
+            model.addAttribute("categoria", tuple.getT1());
+            model.addAttribute("ivas", tuple.getT2());
+            model.addAttribute("empresas", tuple.getT3());
+        }).thenReturn("inventario/editar_categoria");
 
     }
 
     /**
      * Método para editar una categoria
-     * 
+     *
      * @param id
      * @param categoryModel
      * @param exchange
@@ -354,7 +354,7 @@ public class InventoryController {
      */
     @PostMapping("/categorias/{id}")
     public Mono<String> editarUsuario(@PathVariable Integer id,
-            @ModelAttribute("categoria") CategoryModel categoryModel, ServerWebExchange exchange) {
+                                      @ModelAttribute("categoria") CategoryModel categoryModel, ServerWebExchange exchange) {
 
         return categoryService.obtenerCategoria(id)
                 .flatMap(existingCategory -> {
@@ -380,7 +380,7 @@ public class InventoryController {
 
     /**
      * Método para eliminar una categoria
-     * 
+     *
      * @param id
      * @param exchange
      * @return
@@ -404,7 +404,7 @@ public class InventoryController {
 
     /**
      * Método para mostrar la vista de los ivas
-     * 
+     *
      * @param model
      * @param exchange
      * @return
@@ -444,7 +444,7 @@ public class InventoryController {
 
     /**
      * Método para mostrar el formulario de creación de ivas
-     * 
+     *
      * @param model
      * @return
      */
@@ -460,5 +460,98 @@ public class InventoryController {
                     model.addAttribute("ivas", ivas);
                     return "inventario/crear_iva";
                 });
+    }
+
+    /**
+     * Método para guardar un iva
+     *
+     * @param ivaModel
+     * @param exchange
+     * @return
+     */
+    @PostMapping("/ivas")
+    public Mono<String> guardarIVA(@ModelAttribute("iva") IVAModel ivaModel, ServerWebExchange exchange) {
+
+        // Guardar el iva
+        return ivaService.guardarIVA(ivaModel)
+                .doOnSuccess(success -> exchange.getSession()
+                        .doOnNext(session -> session.getAttributes()
+                                .put("successMessage", "IVA Añadido con Éxito!"))
+                        .subscribe())
+                .doOnError(error -> exchange.getSession()
+                        .doOnNext(session -> session.getAttributes()
+                                .put("errorMessage", "Error al Añadir el IVA!"))
+                        .subscribe())
+                .thenReturn("redirect:/inventario/ivas");
+
+    }
+
+    /**
+     * Método para mostrar el formulario de edición de ivas
+     *
+     * @param id
+     * @param model
+     * @return
+     */
+    @GetMapping("/ivas/editar/{id}")
+    public Mono<String> mostrarFormularioEditarIVA(@PathVariable Integer id, Model model) {
+        return ivaService.obtenerIVA(id)
+                .doOnNext(iva -> model.addAttribute("iva", iva))
+                .thenReturn("inventario/editar_iva");
+    }
+
+    /**
+     * Método para editar un iva
+     *
+     * @param id
+     * @param ivaModel
+     * @param exchange
+     * @return
+     */
+    @PostMapping("/ivas/{id}")
+    public Mono<String> editarIVA(@PathVariable Integer id,
+                                  @ModelAttribute("iva") IVAModel ivaModel, ServerWebExchange exchange) {
+
+        return ivaService.obtenerIVA(id)
+                .flatMap(existingIVA -> {
+                    // Actualizar el iva
+                    existingIVA.setIva_nombre(ivaModel.getIva_nombre());
+                    existingIVA.setIva(ivaModel.getIva());
+
+                    // Guardar el iva actualizado
+                    return ivaService.guardarIVA(existingIVA)
+                            .doOnSuccess(success -> exchange.getSession()
+                                    .doOnNext(session -> session.getAttributes()
+                                            .put("successMessage", "IVA Actualizado con Éxito!"))
+                                    .subscribe())
+                            .doOnError(error -> exchange.getSession()
+                                    .doOnNext(session -> session.getAttributes()
+                                            .put("errorMessage", "Error al Actualizar el IVA!"))
+                                    .subscribe());
+                })
+                .thenReturn("redirect:/inventario/ivas");
+
+    }
+
+    /**
+     * Método para eliminar un iva
+     *
+     * @param id
+     * @param exchange
+     * @return
+     */
+    @GetMapping("/ivas/{id}")
+    public Mono<String> eliminarIVA(@PathVariable Integer id, ServerWebExchange exchange) {
+        return ivaService.eliminarIVA(id)
+                .doOnSuccess(success -> exchange.getSession()
+                        .doOnNext(session -> session.getAttributes()
+                                .put("successMessage", "IVA Eliminado con Éxito!"))
+                        .subscribe())
+                .doOnError(error -> exchange.getSession()
+                        .doOnNext(session -> session.getAttributes()
+                                .put("errorMessage", "Error al Eliminar el IVA!"))
+                        .subscribe())
+                .thenReturn("redirect:/inventario/ivas");
+
     }
 }
