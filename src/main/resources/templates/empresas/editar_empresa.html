@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Crear Empresa</title>
+
+    <!-- Estilos de Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+
+    <style>
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div th:insert="~{administradores/navbar_administradores :: navbar}"></div>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-6 offset-md-3">
+                <h2 class="mb-4 text-center">Añadir Nueva Empresa</h2>
+
+                <form th:action="@{/empresas/empresas/{id}(id=${empresa.id_empresa})}" th:object="${empresa}"
+                    enctype="multipart/form-data" method="post" class="needs-validation" novalidate>
+
+                    <div class="mb-3">
+                        <label for="ruc" class="form-label">RUC:</label>
+                        <input type="number" id="ruc" name="ruc" th:field="*{ruc}" placeholder="Escriba el RUC"
+                            class="form-control" required>
+                        <div class="invalid-feedback">
+                            Por favor, ingrese el ruc.
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="razon_social" class="form-label">Razón Social:</label>
+                            <input type="text" id="razon_social" name="razon_social" th:field="*{razon_social}"
+                                placeholder="Escriba la Razon Social" class="form-control" required>
+                            <div class="invalid-feedback">
+                                Por favor, ingrese el nombre.
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="nombre_comercial" class="form-label">Nombre Comercial:</label>
+                            <input type="text" id="nombre_comercial" name="nombre_comercial"
+                                th:field="*{nombre_comercial}" placeholder="Escriba su Apellido" class="form-control"
+                                required>
+                            <div class="invalid-feedback">
+                                Por favor, ingrese el nombre comercial.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="telefono" class="form-label">Teléfono:</label>
+                            <input type="number" id="telefono" name="telefono" th:field="*{telefono}"
+                                placeholder="Escriba su Teléfono" class="form-control" required>
+                            <div class="invalid-feedback">
+                                Por favor, ingrese un teléfono válido.
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="direccion" class="form-label">Direccion:</label>
+                            <input type="text" id="direccion" name="direccion" th:field="*{direccion}"
+                                placeholder="Escriba su Direccion" class="form-control" required>
+                            <div class="invalid-feedback">
+                                Por favor, ingrese una direccion.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Logo actual:</label>
+                        <img th:src="@{'http://localhost:8080' + ${empresa.logo}}" alt="Logo de la empresa"
+                            class="img-fluid" style="width: 100px; height: 100px;"><br>
+
+
+                        <label for="logo" class="form-label">Icono:</label>
+                        <input type="file" id="logo" name="logo" th:field="*{logo}" class="form-control"
+                            aria-label="file example" required>
+                        <div class="invalid-feedback">Por favor, seleccione un logo.</div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="tipo_contribuyente" class="form-label">Tipo de Contribuyente:</label>
+                            <input type="text" id="tipo_contribuyente" name="tipo_contribuyente"
+                                th:field="*{tipo_contribuyente}" placeholder="Escriba la Razon Social"
+                                class="form-control" required>
+                            <div class="invalid-feedback">
+                                Por favor, ingrese el tipo de contribuyente.
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="nombre_comercial" class="form-label">Contabilidad:</label>
+                            <input type="text" id="lleva_contabilidad" name="lleva_contabilidad"
+                                th:field="*{nombre_comercial}" placeholder="Escriba su Apellido" class="form-control"
+                                required>
+                            <div class="invalid-feedback">
+                                Por favor, ingrese el nombre comercial.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Firma Electronica -->
+                    <div class="mb-3">
+                        <label for="firma_electronica" class="form-label">Firma Electrónica:</label>
+                        <input type="file" id="firma_electronica" name="firma_electronica"
+                            th:field="*{firma_electronica}" class="form-control" aria-label="file example" required>
+                        <div class="invalid-feedback">Por favor, seleccione un archivo .p12.</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Firma actual:</label>
+                        <span th:text="${empresa.firma_electronica}"></span><br>
+
+
+                        <label for="firma_electronica" class="form-label">Icono:</label>
+                        <input type="file" id="firma_electronica" name="firma_electronica" th:field="*{firma_electronica}" class="form-control"
+                            aria-label="file example" required>
+                        <div class="invalid-feedback">Por favor, seleccione una firma.</div>
+                    </div>
+
+
+                    <div class="mb-3">
+                        <!-- contraseña -->
+                        <label for="contrasena_firma_electronica" class="form-label">Contraseña de la Firma:</label>
+                        <input type="password" id="contrasena_firma_electronica" name="contrasena_firma_electronica"
+                            th:field="*{contrasena_firma_electronica}" placeholder="Escriba su Contraseña"
+                            class="form-control" required>
+                        <div class="invalid-feedback">
+                            Por favor, ingrese una contraseña.
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <!-- desarrollo -->
+                        <label for="desarrollo" class="form-label">Fase:</label>
+                        <select id="desarrollo" name="desarrollo" th:field="*{desarrollo}" class="form-select" required>
+                            <option value="">Seleccione una fase</option>
+                            <option value="true">Desarrollo</option>
+                            <option value="false">Producción</option>
+                        </select>
+
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">Guardar</button>
+                    </div>
+                </form>
+
+                <div class="mt-3 text-center">
+                    <a th:href="@{/empresas/empresas}" class="btn btn-secondary">Volver a la lista de empresas</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Ejemplo de JavaScript para validación de formularios
+        (function () {
+            'use strict'
+
+            // Obtener todos los formularios a los que queremos aplicar estilos de validación de Bootstrap personalizados
+            var forms = document.querySelectorAll('.needs-validation')
+
+            // Bucle sobre ellos y evitar el envío
+            Array.prototype.slice.call(forms)
+                .forEach(function (form) {
+                    form.addEventListener('submit', function (event) {
+                        if (!form.checkValidity()) {
+                            event.preventDefault()
+                            event.stopPropagation()
+                        }
+
+                        form.classList.add('was-validated')
+                    }, false)
+                })
+        })()
+
+        // Validación de teléfono celular ecuatoriano
+        document.getElementById('telefono').addEventListener('input', function (event) {
+            var telefono = event.target.value;
+            if (!validarTelefonoEcuador(telefono)) {
+                event.target.setCustomValidity('Teléfono no válido.');
+            } else {
+                event.target.setCustomValidity('');
+            }
+        });
+
+        function validarTelefonoEcuador(telefono) {
+            var pattern = /^09[0-9]{8}$/;
+            return pattern.test(telefono);
+        }
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
+
+</body>
+
+</html>
