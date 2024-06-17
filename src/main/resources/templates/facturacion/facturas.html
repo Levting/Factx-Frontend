@@ -69,8 +69,8 @@
                                     class="btn btn-info btn-sm me-2" target="_blank">Ver PDF</a>
 
                                 <!-- Enlace para ver el XML -->
-                                <a th:href="@{/facturacion/factura/xml/{id}(id=${factura.idFactura})}"
-                                    class="btn btn-info btn-sm me-2">Ver XML</a>
+                                <!-- <a th:href="@{/facturacion/factura/xml/{id}(id=${factura.idFactura})}"
+                                    class="btn btn-info btn-sm me-2">Ver XML</a> -->
 
                                 <!-- Enlace para eliminar -->
                                 <!-- <a th:href="@{/facturacion/factura/{id}(id=${factura.idFactura})}" class="btn btn-danger btn-sm">Eliminar</a> -->
@@ -89,7 +89,15 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
         crossorigin="anonymous"></script>
-
+    <script>
+        $(document).ready(function () {
+            // Ocultar mensajes de error y éxito después de 3 segundos
+            setTimeout(function () {
+                $('#errorMessage').fadeOut('slow');
+                $('#successMessage').fadeOut('slow');
+            }, 3000); // 3 segundos
+        });
+    </script>
 </body>
 
 </html>
