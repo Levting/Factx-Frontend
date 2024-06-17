@@ -32,6 +32,12 @@
         </div>
 
         <div class="row">
+            <div th:if="${successMessage}" id="successMessage" class="alert alert-success" role="alert">
+                <p th:text="${successMessage}"></p>
+            </div>
+            <div th:if="${errorMessage}" id="errorMessage" class="alert alert-danger" role="alert">
+                <p th:text="${errorMessage}"></p>
+            </div>
 
             <!-- <form class="d-flex mb-3" role="search">
                 <input class="form-control me-2" type="search" placeholder="Buscar por Cedula del Cliente"
@@ -58,14 +64,16 @@
                                 <strong>Total:</strong> $ <span th:text="${factura.total}">[Total]</span><br>
                             </p>
                             <div class="d-flex justify-content-end">
-                                <a th:href="@{/facturacion/factura/verPDF/{id}(id=${factura.idFactura})}"
-                                    class="btn btn-info btn-sm me-2">Ver PDF</a>
+                                <!-- Enlace para ver el PDF -->
+                                <a th:href="@{/facturacion/factura/pdf/{id}(id=${factura.idFactura})}"
+                                    class="btn btn-info btn-sm me-2" target="_blank">Ver PDF</a>
 
-                                <a th:href="@{/facturacion/factura/verXML/{id}(id=${factura.idFactura})}"
+                                <!-- Enlace para ver el XML -->
+                                <a th:href="@{/facturacion/factura/xml/{id}(id=${factura.idFactura})}"
                                     class="btn btn-info btn-sm me-2">Ver XML</a>
 
-                                <!-- <a th:href="@{/facturacion/factura/{id}(id=${factura.idFactura})}"
-                                    class="btn btn-danger btn-sm">Eliminar</a> -->
+                                <!-- Enlace para eliminar -->
+                                <!-- <a th:href="@{/facturacion/factura/{id}(id=${factura.idFactura})}" class="btn btn-danger btn-sm">Eliminar</a> -->
                             </div>
                         </div>
                     </div>
