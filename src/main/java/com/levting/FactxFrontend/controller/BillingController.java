@@ -71,8 +71,6 @@ public class BillingController {
     @PostMapping("/factura/abrir")
     public Mono<String> abrirFactura(@ModelAttribute("factura") BillingModel billingModel, Model model) {
 
-        System.out.println("Factura: " + billingModel);
-
         Integer id_usuario = billingModel.getUsuario().getId_usuario();
         Integer id_cliente = billingModel.getCliente().getId_cliente();
 

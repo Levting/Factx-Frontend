@@ -33,11 +33,11 @@
 
         <div class="row">
 
-            <form class="d-flex mb-3" role="search">
+            <!-- <form class="d-flex mb-3" role="search">
                 <input class="form-control me-2" type="search" placeholder="Buscar por Cedula del Cliente"
                     aria-label="Buscar">
                 <button class="btn btn-outline-success" type="submit">Buscar</button>
-            </form>
+            </form> -->
 
             <div class="row row-cols-1 row-cols-md-3 g-4">
                 <div th:each="factura : ${facturas}" class="col">
@@ -64,8 +64,8 @@
                                 <a th:href="@{/facturacion/factura/verXML/{id}(id=${factura.idFactura})}"
                                     class="btn btn-info btn-sm me-2">Ver XML</a>
 
-                                <a th:href="@{/facturacion/factura/{id}(id=${factura.idFactura})}"
-                                    class="btn btn-danger btn-sm">Eliminar</a>
+                                <!-- <a th:href="@{/facturacion/factura/{id}(id=${factura.idFactura})}"
+                                    class="btn btn-danger btn-sm">Eliminar</a> -->
                             </div>
                         </div>
                     </div>
