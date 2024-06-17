@@ -44,10 +44,10 @@
                     <p th:text="${errorMessage}"></p>
                 </div>
 
-                <form class="d-flex mb-3" role="search">
+                <!-- <form class="d-flex mb-3" role="search">
                     <input class="form-control me-2" type="search" placeholder="Buscar por Nombre" aria-label="Buscar">
                     <button class="btn btn-outline-success" type="submit">Buscar</button>
-                </form>
+                </form> -->
 
                 <div class="row row-cols-1 row-cols-md-3 g-4">
                     <div th:each="producto : ${productos}" class="col">
@@ -74,8 +74,8 @@
                                 <div class="d-flex justify-content-between">
                                     <a th:href="@{/inventario/productos/editar/{id}(id=${producto.id_producto})}"
                                         class="btn btn-info btn-sm">Editar</a>
-                                    <a th:href="@{/inventario/productos/{id}(id=${producto.id_producto})}"
-                                        class="btn btn-danger btn-sm">Eliminar</a>
+                                    <!-- <a th:href="@{/inventario/productos/{id}(id=${producto.id_producto})}"
+                                        class="btn btn-danger btn-sm">Eliminar</a> -->
                                 </div>
                             </div>
                         </div>
