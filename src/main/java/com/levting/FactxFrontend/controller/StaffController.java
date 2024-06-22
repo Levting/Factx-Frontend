@@ -16,7 +16,8 @@ import reactor.core.publisher.Mono;
 @RequestMapping("/personal")
 public class StaffController {
 
-    // El controlador del personal, gestionara el usuario y el rol, posiblemente tambien la empresa.
+    // El controlador del personal, gestionara el usuario y el rol, posiblemente
+    // tambien la empresa.
 
     private final UserService userService;
     private final RoleService roleService;
@@ -33,8 +34,14 @@ public class StaffController {
      * Controlador del Usuario
      */
 
-    @GetMapping({"/usuarios", ""})
+    @GetMapping({ "/usuarios", "" })
     public Mono<String> mostrarVistaUsuarios(Model model) {
+
+        UserModel usuario = (UserModel) model.getAttribute("usuario");
+        if (usuario == null) {
+            return Mono.just("redirect:/inicio_sesion");
+        }
+
         return userService.obtenerUsuarios()
                 .collectList()
                 .doOnNext(usuarios -> model.addAttribute("usuarios", usuarios))
@@ -51,7 +58,8 @@ public class StaffController {
     }
 
     @PostMapping("/usuarios/{id}")
-    public Mono<String> editarUsuario(@PathVariable Integer id, @Validated @ModelAttribute("usuarioNuevo") UserModel userModel) {
+    public Mono<String> editarUsuario(@PathVariable Integer id,
+            @Validated @ModelAttribute("usuarioNuevo") UserModel userModel) {
         return userService.obtenerUsuario(id)
                 .flatMap(existingUser -> {
                     existingUser.setNombre(userModel.getNombre());
@@ -82,11 +90,10 @@ public class StaffController {
         model.addAttribute("usuarioNuevo", new UserModel());
         return Mono.zip(
                 roleService.obtenerRoles().collectList(),
-                companyService.obtenerEmpresas().collectList()
-        ).doOnNext(tuple -> {
-            model.addAttribute("roles", tuple.getT1());
-            model.addAttribute("empresas", tuple.getT2());
-        }).thenReturn("personal/crear_usuario");
+                companyService.obtenerEmpresas().collectList()).doOnNext(tuple -> {
+                    model.addAttribute("roles", tuple.getT1());
+                    model.addAttribute("empresas", tuple.getT2());
+                }).thenReturn("personal/crear_usuario");
     }
 
     @GetMapping("/usuarios/editar/{id}")
@@ -94,14 +101,12 @@ public class StaffController {
         return Mono.zip(
                 userService.obtenerUsuario(id),
                 roleService.obtenerRoles().collectList(),
-                companyService.obtenerEmpresas().collectList()
-        ).doOnNext(tuple -> {
-            model.addAttribute("usuario", tuple.getT1());
-            model.addAttribute("roles", tuple.getT2());
-            model.addAttribute("empresas", tuple.getT3());
-        }).thenReturn("personal/editar_usuario");
+                companyService.obtenerEmpresas().collectList()).doOnNext(tuple -> {
+                    model.addAttribute("usuario", tuple.getT1());
+                    model.addAttribute("roles", tuple.getT2());
+                    model.addAttribute("empresas", tuple.getT3());
+                }).thenReturn("personal/editar_usuario");
     }
-
 
     /**
      * Controlador para el Rol
@@ -109,6 +114,10 @@ public class StaffController {
 
     @GetMapping("/roles")
     public Mono<String> mostrarRoles(Model model) {
+        UserModel usuario = (UserModel) model.getAttribute("usuario");
+        if (usuario == null) {
+            return Mono.just("redirect:/inicio_sesion");
+        }
         return roleService.obtenerRoles()
                 .collectList()
                 .doOnNext(roles -> model.addAttribute("roles", roles))
@@ -155,6 +164,5 @@ public class StaffController {
         model.addAttribute("rol", roleService.obtenerRol(id));
         return Mono.just("personal/editar_rol");
     }
-
 
 }

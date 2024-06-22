@@ -1,11 +1,15 @@
 package com.levting.FactxFrontend.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.server.ServerWebExchange;
 
 import com.levting.FactxFrontend.model.CompanyModel;
@@ -27,6 +31,13 @@ public class CompanyController {
         this.companyService = companyService;
     }
 
+    /**
+     * Mostrar la vista de las empresas
+     * 
+     * @param model
+     * @param serverWebExchange
+     * @return
+     */
     @GetMapping({ "/empresas", "" })
     public Mono<String> mostrarVistaEmpresas(Model model, ServerWebExchange serverWebExchange) {
         // Obtener el usuario de la sesión
@@ -73,9 +84,73 @@ public class CompanyController {
         return Mono.just("empresas/crear_empresa");
     }
 
-    // Metodo para guardar a una empresa
+    /**
+     * Guardar una empresa
+     * 
+     * @param serverWebExchange
+     * @param ruc
+     * @param razon_social
+     * @param nombre_comercial
+     * @param telefono
+     * @param direccion
+     * @param logo
+     * @param tipo_contribuyente
+     * @param lleva_contabilidad
+     * @param firma_electronica
+     * @param contrasena_firma_electronica
+     * @param desarrollo
+     * @return
+     */
+    @PostMapping(value = "/empresas", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public Mono<String> guardarEmpresa(
+            ServerWebExchange serverWebExchange,
 
-    // Metodo para mostar la pagina de edicion de una empresa
+            @RequestPart("ruc") String ruc,
+            @RequestPart("razon_social") String razon_social,
+            @RequestPart("nombre_comercial") String nombre_comercial,
+            @RequestPart("telefono") String telefono,
+            @RequestPart("direccion") String direccion,
+            @RequestPart("logo") FilePart logo,
+            @RequestPart("tipo_contribuyente") String tipo_contribuyente,
+            @RequestPart("lleva_contabilidad") String lleva_contabilidad,
+            @RequestPart("firma_electronica") FilePart firma_electronica,
+            @RequestPart("contrasena_firma_electronica") String contrasena_firma_electronica,
+            @RequestPart("desarrollo") String desarrollo) {
+
+        // Contruccion del objeto empresa sin el logo y la firma electronica
+        CompanyModel empresa = new CompanyModel();
+        empresa.setRuc(ruc);
+        empresa.setRazon_social(razon_social);
+        empresa.setNombre_comercial(nombre_comercial);
+        empresa.setDireccion(direccion);
+        empresa.setTelefono(telefono);
+        empresa.setTipo_contribuyente(tipo_contribuyente);
+        empresa.setLleva_contabilidad(Boolean.parseBoolean(lleva_contabilidad));
+        empresa.setContrasena_firma_electronica(contrasena_firma_electronica);
+        empresa.setDesarrollo(Boolean.parseBoolean(desarrollo));
+
+        return companyService.guardarEmpresa(empresa, logo, firma_electronica)
+                .doOnSuccess(success -> serverWebExchange.getSession()
+                        .doOnNext(
+                                session -> session.getAttributes().put("successMessage", "Empresa Guardada con Éxito!"))
+                        .subscribe())
+
+                .doOnError(error -> serverWebExchange.getSession()
+                        .doOnNext(
+                                session -> session.getAttributes().put("errorMessage", "Error al Guardar la Empresa!"))
+                        .subscribe())
+
+                .thenReturn("redirect:/empresas");
+
+    }
+
+    /**
+     * Mostrar el formulario para editar una empresa
+     * 
+     * @param id
+     * @param model
+     * @return
+     */
     @GetMapping("/empresas/editar/{id}")
     public Mono<String> mostrarFormularioEditarEmpresa(@PathVariable Integer id, Model model) {
         // Obtener el usuario de la sesión
@@ -88,8 +163,79 @@ public class CompanyController {
         }
     }
 
-    // Metodo para eliminar una empresa
-    @GetMapping("/empresas/eliminar/{id}")
+    /**
+     * Editar una empresa
+     * 
+     * @param id
+     * @param serverWebExchange
+     * @param ruc
+     * @param razon_social
+     * @param nombre_comercial
+     * @param telefono
+     * @param direccion
+     * @param logo
+     * @param tipo_contribuyente
+     * @param lleva_contabilidad
+     * @param firma_electronica
+     * @param contrasena_firma_electronica
+     * @param desarrollo
+     * @return
+     */
+    @PostMapping(value = "/empresas/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public Mono<String> editarEmpresa(
+            @PathVariable Integer id, ServerWebExchange serverWebExchange,
+
+            @RequestPart("ruc") String ruc,
+            @RequestPart("razon_social") String razon_social,
+            @RequestPart("nombre_comercial") String nombre_comercial,
+            @RequestPart("telefono") String telefono,
+            @RequestPart("direccion") String direccion,
+            @RequestPart("logo") FilePart logo,
+            @RequestPart("tipo_contribuyente") String tipo_contribuyente,
+            @RequestPart("lleva_contabilidad") String lleva_contabilidad,
+            @RequestPart("firma_electronica") FilePart firma_electronica,
+            @RequestPart("contrasena_firma_electronica") String contrasena_firma_electronica,
+            @RequestPart("desarrollo") String desarrollo) {
+
+        return companyService.obtenerEmpresa(id)
+                .flatMap(existingCompany -> {
+                    // Actualizar la empresa
+                    existingCompany.setRuc(ruc);
+                    existingCompany.setRazon_social(razon_social);
+                    existingCompany.setNombre_comercial(nombre_comercial);
+                    existingCompany.setDireccion(direccion);
+                    existingCompany.setTelefono(telefono);
+                    existingCompany.setTipo_contribuyente(tipo_contribuyente);
+                    existingCompany.setLleva_contabilidad(Boolean.parseBoolean(lleva_contabilidad));
+                    existingCompany.setContrasena_firma_electronica(contrasena_firma_electronica);
+                    existingCompany.setDesarrollo(Boolean.parseBoolean(desarrollo));
+
+                    return companyService.guardarEmpresa(existingCompany, logo,
+                            firma_electronica)
+                            .doOnSuccess(success -> serverWebExchange.getSession()
+                                    .doOnNext(
+                                            session -> session.getAttributes().put("successMessage",
+                                                    "Empresa Actualizada con Éxito!"))
+                                    .subscribe())
+
+                            .doOnError(error -> serverWebExchange.getSession()
+                                    .doOnNext(
+                                            session -> session.getAttributes().put("errorMessage",
+                                                    "Error al Actualizar la Empresa!"))
+                                    .subscribe());
+
+                }).thenReturn("redirect:/empresas");
+
+    }
+
+    /**
+     * Eliminar una empresa
+     * 
+     * @param id
+     * @param serverWebExchange
+     * @return
+     */
+    @GetMapping("/empresas/{id}")
     public Mono<String> eliminarEmpresa(@PathVariable Integer id, ServerWebExchange serverWebExchange) {
         // Eliminar la empresa
         return companyService.eliminarEmpresa(id)

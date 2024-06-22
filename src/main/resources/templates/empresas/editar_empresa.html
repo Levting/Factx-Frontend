@@ -85,7 +85,9 @@
 
                     <div class="mb-3">
                         <label class="form-label">Logo actual:</label>
-                        <img th:src="@{'http://localhost:8080' + ${empresa.logo}}" alt="Logo de la empresa"
+                        <!-- <img th:src="@{'http://localhost:8080' + ${empresa.logo}}" alt="Logo de la empresa"
+                            class="img-fluid" style="width: 100px; height: 100px;"><br> -->
+                        <img th:src="@{'http://34.74.207.191:8081' + ${empresa.logo}}" alt="Logo de la empresa"
                             class="img-fluid" style="width: 100px; height: 100px;"><br>
 
 
@@ -107,9 +109,9 @@
                         </div>
 
                         <div class="col-md-6">
-                            <label for="nombre_comercial" class="form-label">Contabilidad:</label>
+                            <label for="lleva_contabilidad" class="form-label">Contabilidad:</label>
                             <input type="text" id="lleva_contabilidad" name="lleva_contabilidad"
-                                th:field="*{nombre_comercial}" placeholder="Escriba su Apellido" class="form-control"
+                                th:field="*{lleva_contabilidad}" placeholder="Escriba su Apellido" class="form-control"
                                 required>
                             <div class="invalid-feedback">
                                 Por favor, ingrese el nombre comercial.
@@ -117,23 +119,19 @@
                         </div>
                     </div>
 
-                    <!-- Firma Electronica -->
-                    <div class="mb-3">
-                        <label for="firma_electronica" class="form-label">Firma Electrónica:</label>
-                        <input type="file" id="firma_electronica" name="firma_electronica"
-                            th:field="*{firma_electronica}" class="form-control" aria-label="file example" required>
-                        <div class="invalid-feedback">Por favor, seleccione un archivo .p12.</div>
-                    </div>
+
 
                     <div class="mb-3">
+                        <!-- Firma Electronica -->
+                        <div class="mb-3">
+                            <label for="firma_electronica" class="form-label">Firma Electrónica:</label>
+                            <input type="file" id="firma_electronica" name="firma_electronica"
+                                th:field="*{firma_electronica}" class="form-control" aria-label="file example" required>
+                            <div class="invalid-feedback">Por favor, seleccione un archivo .p12.</div>
+                        </div>
+
                         <label class="form-label">Firma actual:</label>
                         <span th:text="${empresa.firma_electronica}"></span><br>
-
-
-                        <label for="firma_electronica" class="form-label">Icono:</label>
-                        <input type="file" id="firma_electronica" name="firma_electronica" th:field="*{firma_electronica}" class="form-control"
-                            aria-label="file example" required>
-                        <div class="invalid-feedback">Por favor, seleccione una firma.</div>
                     </div>
 
 

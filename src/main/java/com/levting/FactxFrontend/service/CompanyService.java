@@ -1,8 +1,12 @@
 package com.levting.FactxFrontend.service;
 
 import com.levting.FactxFrontend.model.CompanyModel;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Flux;
@@ -33,23 +37,18 @@ public class CompanyService {
         return webClient.get()
                 .uri("/empresa/{id}", id_empresa)
                 .retrieve()
-                .bodyToMono(CompanyModel.class)
-                .onErrorResume(WebClientResponseException.class, ex -> {
-                    System.err.println("Error al obtener una empresa: " + ex.getMessage());
-                    return Mono.empty();
-                });
+                .bodyToMono(CompanyModel.class);
     }
 
-    public Mono<CompanyModel> guardarEmpresa(CompanyModel companyModel) {
+    public Mono<Void> guardarEmpresa(CompanyModel companyModel, FilePart logo, FilePart firma_electronica) {
         return webClient.post()
                 .uri("/empresa")
-                .bodyValue(companyModel)
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .body(BodyInserters.fromMultipartData("empresa", companyModel)
+                        .with("logo", logo)
+                        .with("firma_electronica", firma_electronica))
                 .retrieve()
-                .bodyToMono(CompanyModel.class)
-                .onErrorResume(WebClientResponseException.class, ex -> {
-                    System.err.println("Error al guardar la empresa: " + ex.getMessage());
-                    return Mono.empty();
-                });
+                .bodyToMono(Void.class);
     }
 
     public Mono<Void> eliminarEmpresa(Integer id_empresa) {

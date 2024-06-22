@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
-
 @Controller
 public class LoginController {
 
@@ -18,10 +17,10 @@ public class LoginController {
     private UserService userService;
 
     // Manejo de las solicitudes GET a las rutas "/inicio_sesion" y "/"
-    @GetMapping({"/inicio_sesion", "/"})
-    public String mostrarFormularioInicioSesion() {
+    @GetMapping({ "/inicio_sesion", "/" })
+    public Mono<String> mostrarFormularioInicioSesion() {
         // Retorna el nombre de la vista de inicio de sesión
-        return "inicio_sesion";
+        return Mono.just("inicio_sesion");
     }
 
     // Manejo de las solicitudes POST a la ruta "/inicio_sesion"
@@ -68,6 +67,3 @@ public class LoginController {
         });
     }
 }
-
-
-

@@ -188,6 +188,7 @@ public class InventoryController {
     @PostMapping(value = "/productos/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public Mono<String> editarProducto(
             @PathVariable Integer id, ServerWebExchange serverWebExchange,
+            
             @RequestPart("producto") String producto,
             @RequestPart("descripcion") String descripcion,
             @RequestPart("categoria.id_categoria") String idCategoria,
