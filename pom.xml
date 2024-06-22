@@ -29,12 +29,6 @@
 
     <!-- Dependencias del proyecto -->
     <dependencies>
-        <!-- Dependencia para Spring Web -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
-
         <!-- Dependencia para Spring WebFlux -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

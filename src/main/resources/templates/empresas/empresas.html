@@ -19,8 +19,7 @@
         <div class="row mb-4 align-items-center">
             <div class="md-9 d-flex justify-content-between align-items-center">
                 <h1 class="mb-0">Empresas</h1>
-                <!-- <a th:href="@{/empresas/empresas/crear}" class="btn btn-outline-secondary ms-auto">Nueva Empresa</a> -->
-                <a href="#" class="btn btn-outline-secondary ms-auto">Nueva Empresa</a>
+                <a th:href="@{/empresas/empresas/crear}" class="btn btn-outline-secondary ms-auto">Nueva Empresa</a>
             </div>
         </div>
 
@@ -31,6 +30,13 @@
                     <input class="form-control me-2" type="search" placeholder="Buscar por Nombre" aria-label="Buscar">
                     <button class="btn btn-outline-success" type="submit">Buscar</button>
                 </form> -->
+
+                <div th:if="${successMessage}" id="successMessage" class="alert alert-success" role="alert">
+                    <p th:text="${successMessage}"></p>
+                </div>
+                <div th:if="${errorMessage}" id="errorMessage" class="alert alert-danger" role="alert">
+                    <p th:text="${errorMessage}"></p>
+                </div>
 
                 <div class="table-responsive">
                     <table class="table table-striped table-hover">
@@ -51,16 +57,11 @@
                                 <td th:text="${empresa.telefono}">[Telefono]</td>
                                 <td th:text="${empresa.desarrollo ? 'Desarrollo' : 'Producción'}">[Fase]</td>
                                 <td>
-                                    <!-- <a th:href="@{/empresas/empresas/editar/{id}(id=${empresa.id_empresa})}"
+                                    <a th:href="@{/empresas/empresas/editar/{id}(id=${empresa.id_empresa})}"
                                         class="btn btn-info btn-sm">Editar</a>
 
                                     <a th:href="@{/empresas/empresas/{id}(id=${empresa.id_empresa})}"
-                                        class="btn btn-danger btn-sm">Eliminar</a> -->
-
-                                    <a href="#" class="btn btn-info btn-sm">Editar</a>
-
-                                    <a href="#" class="btn btn-danger btn-sm">Eliminar</a>
-
+                                        class="btn btn-danger btn-sm">Eliminar</a>
                                 </td>
                             </tr>
                         </tbody>
@@ -70,6 +71,17 @@
         </div>
     </div>
 
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Ocultar mensajes de error y éxito después de 3 segundos
+            setTimeout(function () {
+                $('#errorMessage').fadeOut('slow');
+                $('#successMessage').fadeOut('slow');
+            }, 3000); // 3 segundos
+        });
+    </script>
 </body>
 
 </html>

@@ -60,8 +60,11 @@
                                             th:text="${producto.categoria.categoria}">
                                             [Categoría]</h6>
                                     </div>
-                                    <img th:src="@{'http://localhost:8080' + ${producto.icono}}"
-                                        alt="Imagen del Producto" class="img-fluid" style="width: 70px; height: 70px;">
+                                    <!--<img th:src="@{'http://localhost:8080' + ${producto.icono}}"
+                                        alt="Imagen del Producto" class="img-fluid" style="width: 70px; height: 70px;">-->
+
+                                    <img th:src="@{'http://34.74.207.191:8081' + ${producto.icono}}"
+                                         alt="Imagen del Producto" class="img-fluid" style="width: 70px; height: 70px;">
                                 </div>
                                 <p class="card-text mt-2">
                                     <strong>ID:</strong> <span th:text="${producto.id_producto}">[ID]</span><br>

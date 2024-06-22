@@ -94,7 +94,7 @@
                         <div class="col-md-6">
                             <label for="tipo_contribuyente" class="form-label">Tipo de Contribuyente:</label>
                             <input type="text" id="tipo_contribuyente" name="tipo_contribuyente"
-                                th:field="*{tipo_contribuyente}" placeholder="Escriba la Razon Social"
+                                th:field="*{tipo_contribuyente}" placeholder="Escriba el Contribuyente"
                                 class="form-control" required>
                             <div class="invalid-feedback">
                                 Por favor, ingrese el tipo de contribuyente.
@@ -102,13 +102,13 @@
                         </div>
 
                         <div class="col-md-6">
-                            <label for="nombre_comercial" class="form-label">Contabilidad:</label>
-                            <input type="text" id="lleva_contabilidad" name="lleva_contabilidad"
-                                th:field="*{nombre_comercial}" placeholder="Escriba su Apellido" class="form-control"
-                                required>
-                            <div class="invalid-feedback">
-                                Por favor, ingrese el nombre comercial.
-                            </div>
+                            <!-- desarrollo -->
+                            <label for="lleva_contabilidad" class="form-label">¿Lleva Contabilidad?:</label>
+                            <select id="lleva_contabilidad" name="lleva_contabilidad" th:field="*{lleva_contabilidad}" class="form-select" required>
+                                <option value="">Seleccione una opción</option>
+                                <option value="true">SI</option>
+                                <option value="false">NO</option>
+                            </select>
                         </div>
                     </div>
 
@@ -132,6 +132,7 @@
                         </div>
                     </div>
 
+                    <!-- Modifica la entrada de desarrollo como un valor booleano -->
                     <div class="mb-3">
                         <!-- desarrollo -->
                         <label for="desarrollo" class="form-label">Fase:</label>
@@ -140,7 +141,6 @@
                             <option value="true">Desarrollo</option>
                             <option value="false">Producción</option>
                         </select>
-
                     </div>
 
                     <div class="d-grid">

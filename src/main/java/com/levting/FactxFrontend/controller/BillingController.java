@@ -99,17 +99,22 @@ public class BillingController {
      */
     @GetMapping("/facturas/crear")
     public Mono<String> mostrarFormularioCrearFactura(Model model) {
-        // Añadir un nuevo objeto Factura al modelo
-        model.addAttribute("factura", new BillingModel());
-
-        // Añadir el usuario al modelo
         UserModel usuario = (UserModel) model.getAttribute("usuario");
-        model.addAttribute("usuario", usuario);
+        if (usuario != null) {
+            // Añadir un nuevo objeto Factura al modelo
+            model.addAttribute("factura", new BillingModel());
 
-        // Obtener los clientes y añadirlos al modelo
-        return customerService.obtenerClientes().collectList()
-                .doOnNext(clientes -> model.addAttribute("clientes", clientes))
-                .thenReturn("facturacion/crear_factura");
+            // Añadir el usuario al modelo
+            model.addAttribute("usuario", usuario);
+
+            // Obtener los clientes y añadirlos al modelo
+            return customerService.obtenerClientes().collectList()
+                    .doOnNext(clientes -> model.addAttribute("clientes", clientes))
+                    .thenReturn("facturacion/crear_factura");
+        } else {
+            return Mono.just("redirect:/inicio_sesion");
+        }
+
     }
 
     /**
@@ -121,6 +126,11 @@ public class BillingController {
      */
     @PostMapping("/factura/abrir")
     public Mono<String> abrirFactura(@ModelAttribute("factura") BillingModel billingModel, Model model) {
+
+        UserModel usuario = (UserModel) model.getAttribute("usuario");
+        if (usuario == null) {
+            return Mono.just("redirect:/inicio_sesion");
+        }
 
         // Obtener el id del usuario y el id del cliente del modelo factura al enviar la
         // petición post
@@ -248,8 +258,9 @@ public class BillingController {
         return billingService.obtenerFactura(id_factura)
                 .flatMap(factura -> {
                     String claveAcceso = factura.getClave_acceso();
-                    String pdfUrl = "http://localhost:8080/uploads/documents/pdf/" + claveAcceso
-                            + ".pdf";
+                    // String pdfUrl = "http://localhost:8080/uploads/documents/pdf/" + claveAcceso
+                    // + ".pdf";
+                    String pdfUrl = "http://34.74.207.191:8081/uploads/documents/pdf/" + claveAcceso + ".pdf";
 
                     HttpHeaders headers = new HttpHeaders();
                     headers.setLocation(URI.create(pdfUrl));
