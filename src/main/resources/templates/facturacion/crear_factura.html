@@ -241,7 +241,7 @@
                             var row = '<tr>' +
                                 '<td class="align-middle" data-id="' + producto.id_producto + '">' +
                                 '<div class="d-flex align-items-center">' +
-                                '<img src="http://34.74.207.191:8080/Factx-Backend' + producto.icono + '" alt="Icono del Producto" class="img-fluid me-2" style="width: 40px; height: 40px;">' +
+                                '<img src="http://34.74.207.191:8081' + producto.icono + '" alt="Icono del Producto" class="img-fluid me-2" style="width: 40px; height: 40px;">' +
                                 '<div>' +
                                 '<div>' + producto.producto + '</div>' +
                                 '<small class="text-muted">' + producto.categoria.categoria + '</small>' +
@@ -252,7 +252,7 @@
                                 '<td class="align-middle"><input type="number" class="form-control" name="precio" value="' + producto.precio + '" disabled></td>' +
                                 '<td class="align-middle subtotal">' + producto.precio.toFixed(2) + '</td>' +
                                 '<td class="align-middle">' +
-                                '<button class="btn btn-success add-billDetail" data-producto-id="' + producto.id_producto + '">Añadir a la Factura</button> ' +
+                                '<button class="btn btn-success add-billDetail" data-producto-id="' + producto.id_producto + '">Añadir</button> ' +
                                 '<button class="btn btn-danger remove-product-btn">Eliminar</button>' +
                                 '</td>' +
                                 '</tr>';
